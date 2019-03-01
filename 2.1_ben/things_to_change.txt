@@ -1,0 +1,25 @@
+
+
+1) elcall set in congradpim for pim models
+and hence was set in recipE for rim - but not for pim 
+
+Must have this done seperately for all types 
+
+
+2) need to call seperations for rim in energy since again done 
+as part of polarisation 
+
+Must use the seperate seperation routine at sensible time to suit all
+This is required so on;y one set of code and can properly address the 
+shite parallelisation
+
+3) One routine for CG min of polarisation for cal of electric field - like energy routine. 
+
+
+4) Parallelisation
+    Recip = Precalculate k-vectors and loop over them evenly. 
+    Real = neighbour list - vector of all pairwise interactions within cutoff - loop over with step for number of processes
+
+    OPENMP = possible openMP in addition to MPI
+      Recip = difficult - not enought vectors really ?  Perhaps break up whole array terms in chuncks?  
+      Real = probably OK to go over interaction pairs in chuncks one for each thread.  

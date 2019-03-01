@@ -1,0 +1,298 @@
+#
+# Makefile for analyse_md    
+
+# tunable parameters
+#
+# FC            name of the fortran compiling system to use
+# LDFLAGS       flags to the loader
+# libs          list of libraries
+# cmd           name of the executable
+# proflib       library needed for profiling
+#
+
+# FPP options 
+ FPP_BASE_OPTIONS  =   # -Dvdw_ewald # -Ddebug -Dlight_scattering -Ddebye_scherer 
+# FPP_OPTIONS  =  
+#
+
+ifeq ($(TYPE),rim)
+FPP_OPTIONS = $(FPP_BASE_OPTIONS)   
+endif 
+ifeq ($(TYPE),dipole)
+FPP_OPTIONS = $(FPP_BASE_OPTIONS) -Ddipole  
+endif 
+ifeq ($(TYPE),quadrupole) 
+FPP_OPTIONS = $(FPP_BASE_OPTIONS) -Ddipole  -Dquadrupole 
+endif 
+
+#####################################################################################################################
+# INTEL
+
+ FC  =    mpiifort 
+# FC  =    mpif90    -fp-model precise 
+
+ FPP          =    fpp -free -f90  $(FPP_OPTIONS)   
+
+
+ifeq ($(DEBUG),TRUE) 
+# Debug compile 
+ FFLAGS =   -g -save-temps -check all -traceback  -O0 -extend-source 132 -mcmodel=medium -shared-intel -warn all -assume noold_unit_star  -fpe3  #-openmp 
+
+else
+# optimised compiled 
+ FFLAGS =    -O2 -save-temps  -extend-source 132 -mcmodel=medium -shared-intel #-align array32byte #-ipo # -openmp # -openmp-report=2 # -vec-report5
+# FFLAGS =    -O3 -save-temps  -extend-source 132 -mcmodel=medium -shared-intel -align array32byte -ipo # -openmp # -openmp-report=2 # -vec-report5
+
+endif 
+
+
+
+ LDFLAGS =    -mcmodel=medium -shared-intel #-lefence #-openmp 
+#
+
+
+#####################################################################################################################
+# gfortran
+
+# FC  =   mpif90     
+#
+# FPP          =    fpp -ffree-line-length-none  $(FPP_OPTIONS)  
+#
+#ifeq ($(DEBUG),TRUE) 
+#
+#
+## Debug compile 
+# FFLAGS =   -g -ggdb -fbacktrace -O0 -ffree-line-length-none 
+#
+#else
+## optimised compiled 
+# FFLAGS =   -O3 -ffree-line-length-none 
+#
+#endif 
+#
+# LDFLAGS =     
+#
+
+#####################################################################################################################
+
+# Install directory 
+ INSTALL_DIRECTORY = ~/bin
+
+
+#####################################################################################################################
+#
+# lines from here on down should not need to be changed.  they are the
+# actual rules which make uses to build the executable 
+#
+ 
+src     = main.F90 kset.F90 dcell.F90 dump.F90 ener.F90 cgener.F90 error_function.F90   \
+          fourinvert.F90 lightcfcalcnew.F90 shortrange.F90 \
+          lightarraynew.F90               lightfields.F90\
+          gauss.F90 invert.F90 output.F90 ran1.F90 rdftern.F90 cgfirst1.F90 \
+          cgfirst2.F90 \
+          rdfouttern.F90 readin.F90  \
+          fullreal.F90 cgrealE_clus_dippim.F90 \
+          cgrealE_clus_quadpim.F90 cgrealE_dippim.F90 cgrealE_chargequad.F90 \
+          cgrealE_dipquad.F90 cgfullreal.F90  \
+          fullrecip.F90 \
+          cgrecipE_dippim.F90 cgrecipE_chargequad.F90 cgrecipE_dipquad.F90 \
+          cgfullrecip.F90 sr_energy.F90 cgsr_energy.F90 rescale.F90  \
+          rstrun.F90 setup.F90 shake.F90 \
+          debye_scherer_out.F90 trans_chains.F90 velsetvv.F90 BRENT.F90 DBRENT.F90 \
+          DF1DIMAIM.F90 DF1DIMSTRUCT.F90 F1DIMAIM.F90 F1DIMSTRUCT.F90 \
+          DFUNCAIM.F90 DFUNCSTRUCT.F90 FUNCAIM.F90 FUNCSTRUCT.F90 LINMINAIM.F90 \
+          LINMINSTRUCT.F90 MNBRAKAIM.F90 MNBRAKSTRUCT.F90 FRPRMNAIM.F90 \
+          FRPRMNSTRUCT.F90 conjgradpim.F90 conjgradaim.F90 conjgradpimaim.F90 \
+          conjstruct.F90 dipCG.F90 dipquadCG.F90 dynmat.F90 separations.F90 \
+          modules.F90 boxreset.F90 tramp.F90 pramp.F90 kmaxpara.F90 numpara.F90 \
+          random.F90 output_MABC.F90 lightcfdump.F90
+
+# Object files
+objs =  $(src:.F90=.o) 
+
+%.o: %.F90
+	$(FC) $(FPP_OPTIONS) $(FFLAGS)  -c  $< 
+
+#%.f90: %.F90
+#	$(FPP) $<  $@      
+
+
+all:  pimaim_2.1   
+
+
+pimaim_2.1:            $(objs) 
+	$(FC) $(LDFLAGS) -o $@  $(objs) $(libs)
+
+
+clean:
+	-rm -f $(objs) *.i90  *.mod pimain_2.0  
+
+
+install:
+	cp pimaim_2.0  $(INSTALL_DIRECTORY)
+
+
+
+# dependencies
+
+main.o : main.F90 modules.o readin.o setup.o \
+         rstrun.o dynmat.o velsetvv.o conjgradpimaim.o conjgradaim.o \
+         conjgradpim.o rescale.o dump.o conjstruct.o output.o ener.o \
+         trans_chains.o rdftern.o rdfouttern.o tramp.o pramp.o \
+         debye_scherer_out.o shortrange.o lightfields.o \
+         lightarraynew.o lightcfcalcnew.o lightcfdump.o kmaxpara.o numpara.o 
+
+kset.o : kset.F90 modules.o dcell.o
+
+dcell.o : dcell.F90 modules.o   
+
+dump.o : dump.F90 modules.o 
+
+ener.o : ener.F90 modules.o fullrecip.o fullreal.o sr_energy.o 
+
+cgener.o : cgener.F90 modules.o cgrealE_clus_quadpim.o cgrecipE_chargequad.o \
+         cgrealE_chargequad.o cgrecipE_dipquad.o cgrealE_dipquad.o cgfullrecip.o \
+         cgfullreal.o cgrealE_clus_dippim.o cgrecipE_dippim.o \
+         cgrealE_dippim.o
+
+error_function.o : error_function.F90 
+
+gauss.o : gauss.F90 modules.o ran1.o
+
+invert.o : invert.F90 modules.o
+
+output.o : output.F90 modules.o 
+
+ran1.o : ran1.F90 
+
+rdftern.o : rdftern.F90 modules.o 
+
+rdfouttern.o : rdfouttern.F90 modules.o 
+
+readin.o : readin.F90 modules.o dcell.o \
+           invert.o 
+
+fullreal.o : fullreal.F90 modules.o 
+
+cgrealE_clus_dippim.o : cgrealE_clus_dippim.F90 modules.o 
+
+cgrealE_clus_quadpim.o : cgrealE_clus_quadpim.F90 modules.o 
+
+cgrealE_dippim.o : cgrealE_dippim.F90 modules.o 
+
+cgrealE_chargequad.o : cgrealE_chargequad.F90 modules.o 
+
+cgrealE_dipquad.o : cgrealE_dipquad.F90 modules.o 
+
+cgfullreal.o : cgfullreal.F90 modules.o 
+
+fullrecip.o : fullrecip.F90 modules.o error_function.o
+
+cgrecipE_dippim.o : cgrecipE_dippim.F90 modules.o 
+
+cgrecipE_chargequad.o : cgrecipE_chargequad.F90 modules.o 
+
+cgrecipE_dipquad.o : cgrecipE_dipquad.F90 modules.o 
+
+cgfullrecip.o : cgfullrecip.F90 modules.o 
+
+sr_energy.o : sr_energy.F90 modules.o 
+
+cgsr_energy.o : cgsr_energy.F90 modules.o 
+
+rescale.o : rescale.F90 modules.o 
+
+rstrun.o : rstrun.F90 modules.o velsetvv.o dcell.o invert.o boxreset.o kset.o
+
+setup.o : setup.F90 modules.o ran1.o boxreset.o dcell.o kset.o error_function.o 
+
+shake.o : shake.F90 modules.o 
+
+debye_scherer_out.o : debye_scherer_out.F90 modules.o 
+
+trans_chains.o : trans_chains.F90 modules.o invert.o shake.o \
+                 dcell.o boxreset.o kset.o conjgradpimaim.o conjgradpim.o \
+                 conjgradaim.o ener.o kmaxpara.o
+
+velsetvv.o : velsetvv.F90 modules.o  gauss.o rescale.o
+
+BRENT.o : BRENT.F90
+
+DBRENT.o : DBRENT.F90
+
+DF1DIMAIM.o : DF1DIMAIM.F90 modules.o  DFUNCAIM.o
+
+DF1DIMSTRUCT.o : DF1DIMSTRUCT.F90 modules.o DFUNCSTRUCT.o
+
+F1DIMAIM.o : F1DIMAIM.F90 modules.o cgsr_energy.o FUNCAIM.o
+
+F1DIMSTRUCT.o : F1DIMSTRUCT.F90 modules.o  \
+                conjgradpimaim.o conjgradaim.o conjgradpim.o FUNCSTRUCT.o
+
+DFUNCAIM.o : DFUNCAIM.F90 modules.o
+
+DFUNCSTRUCT.o : DFUNCSTRUCT.F90 modules.o
+
+FUNCAIM.o : FUNCAIM.F90 modules.o
+
+FUNCSTRUCT.o : FUNCSTRUCT.F90 modules.o
+
+LINMINAIM.o : LINMINAIM.F90 modules.o  MNBRAKAIM.o DBRENT.o
+
+LINMINSTRUCT.o : LINMINSTRUCT.F90 modules.o  \
+                 MNBRAKSTRUCT.o DBRENT.o
+
+MNBRAKAIM.o : MNBRAKAIM.F90 F1DIMAIM.o
+
+MNBRAKSTRUCT.o : MNBRAKSTRUCT.F90 F1DIMSTRUCT.o
+
+FRPRMNAIM.o : FRPRMNAIM.F90 modules.o separations.o               \
+              cgsr_energy.o DFUNCAIM.o FUNCAIM.o LINMINAIM.o
+
+FRPRMNSTRUCT.o : FRPRMNSTRUCT.F90 modules.o ener.o \
+                 FUNCSTRUCT.o DFUNCSTRUCT.o LINMINSTRUCT.o conjgradpimaim.o \
+                 conjgradaim.o conjgradpim.o
+
+conjgradpim.o : conjgradpim.F90 modules.o error_function.o dipquadCG.o dipCG.o
+
+conjgradaim.o : conjgradaim.F90 modules.o FRPRMNAIM.o
+
+conjgradpimaim.o : conjgradpimaim.F90 modules.o  \
+                   error_function.o cgener.o FRPRMNAIM.o dipquadCG.o dipCG.o
+
+conjstruct.o : conjstruct.F90 modules.o FRPRMNSTRUCT.o
+
+dipCG.o : dipCG.F90 modules.o cgener.o
+
+dipquadCG.o : dipquadCG.F90 modules.o cgener.o cgfirst1.o cgfirst2.o
+
+cgfirst1.o : cgfirst1.F90 modules.o 
+
+cgfirst2.o : cgfirst2.F90 modules.o 
+
+dynmat.o : dynmat.F90 modules.o conjgradpim.o
+
+separations.o : separations.F90 modules.o 
+
+boxreset.o : boxreset.F90 modules.o dcell.o invert.o
+
+pramp.o : pramp.F90
+
+tramp.o : tramp.F90
+
+modules.o : modules.F90
+
+shortrange.o : shortrange.F90 modules.o invert.o
+
+lightfields.o : lightfields.F90 modules.o 
+
+lightarraynew.o : lightarraynew.F90 modules.o 
+
+lightcfcalcnew.o : lightcfcalcnew.F90 
+
+lightcfdump.o : lightcfdump.F90 modules.o 
+
+kmaxpara.o : kmaxpara.F90 modules.o  
+
+numpara.o : numpara.F90 modules.o 
+

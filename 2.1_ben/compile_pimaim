@@ -1,0 +1,144 @@
+#! /bin/sh
+#
+# This shell script adapts the Makefile for machine dependence 
+# and compiles in a subdirectory depending on the options
+# 
+# modified from a similar script in the gulp code by G Watson 
+
+makedir()
+{
+  if [ ! -d "$dir" ]
+  then
+    mkdir "$dir"
+  fi
+  cd $dir
+  rm -f makefile 
+}
+
+removedir()
+{
+       echo " "
+       echo " Cleaning up compilation directory"
+  if [  -d "$dir" ]
+  then
+       echo " Removing compilation directory $dir" 
+       rm -fr "$dir"
+
+       exec="$pimaim$dir" 
+       echo " Removing executable $exec" 
+       echo " "
+       rm -f "$exec" 
+  else 
+       echo " directory $dir does not exist - nothing to do !" 
+  fi
+       echo " "
+}
+
+#############################################################################################################
+echo " "
+echo " "
+echo " PIMAIM compilation system version 1.0 "
+echo " "
+echo " Written by G.Watson "
+echo " " 
+echo " " 
+##############################################################################################################
+#
+# help !
+
+        if [ "$1" == "help" ]; then
+           echo " "
+           echo "Syntax is comp_pimaim <option1> <option2> "
+           echo " " 
+           echo "      <option1>  is rim, dipole or quadrupole or all"
+           echo "      <option2>  is debug "
+           echo " " 
+           echo " Example "
+           echo " " 
+           echo "       ./compile_pimain dipole debug "
+           echo " " 
+           echo "              Will compile pimaim for for dipoles using debug options"
+           echo " " 
+           echo " " 
+           exit 
+         fi
+
+##############################################################################################################
+#############################################################################################################
+# 
+# create directory from options 
+
+           pimaim="pimaim_2.1_" 
+           echo $pimaim 
+
+           dir="$1" 
+
+           if [ "$2" == "clean" ]; then
+              removedir 
+              exit 
+           fi 
+
+           if [ "$2" == "debug" ]; then
+              dir="$1_$2" 
+              if [ "$3" == "clean" ]; then
+                 removedir 
+                 exit 
+              fi 
+           fi 
+
+           if [ "$1" == "allclean" ]; then 
+              dir="rim"
+              removedir 
+              dir="rim_debug"
+              removedir 
+              dir="dipole"
+              removedir 
+              dir="dipole_debug"
+              removedir 
+              dir="quadrupole"
+              removedir 
+              dir="quadrupole_debug"
+              removedir 
+              exit
+           fi
+
+           if [ "$1" != "rim" ]; then 
+             if [ "$1" != "dipole" ]; then 
+               if [ "$1" != "quadrupole" ]; then 
+                 echo "unknown compile type $1"           
+                 echo ""           
+                 exit 
+               fi
+             fi
+           fi 
+ 
+
+           echo " " 
+           echo "compilation directory is $dir"
+           echo " " 
+           makedir
+           
+rsync -arxH ../*.F90 .    
+rsync -arxH ../makefile_gww makefile 
+
+
+if [ "$2" == "debug" ]; then
+   make TYPE=$1 DEBUG=TRUE  
+else
+   make TYPE=$1   
+fi    
+
+#make $target
+#
+# Move executable back to level at which make command was issued
+#
+exec="$pimaim$1"
+
+if [ "$2" == "debug" ] ;  then
+exec="$pimaim$1_$2"
+fi
+
+#echo $exec
+
+cp -i pimaim_2.1 ~/bin/$exec 
+cp pimaim_2.1 ../$exec 

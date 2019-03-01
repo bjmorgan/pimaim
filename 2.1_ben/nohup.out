@@ -1,0 +1,17 @@
+Exception in thread SUPPORT_ACTION_MANAGER:
+Traceback (most recent call last):
+  File "threading.py", line 801, in __bootstrap_inner
+  File "dropbox/client/bolt/signalling.py", line 192, in run
+  File "dropbox/client/bolt/signalling.py", line 222, in _long_poll
+  File "dropbox/client/support_actions.py", line 68, in func_wrapper
+  File "dropbox/client/support_actions.py", line 368, in on_bolt_update
+  File "dropbox/client/support_actions.py", line 68, in func_wrapper
+  File "dropbox/client/support_actions.py", line 238, in _update_bolt_info
+  File "dropbox/client/support_actions.py", line 318, in _get_latest_token_and_revision
+  File "dropbox/client_api/dropbox_connection.py", line 1120, in get_support_action_bolt_info
+  File "dropbox/client_api/dropbox_connection.py", line 739, in request
+  File "dropbox/client_api/dropbox_connection.py", line 758, in request_with_response
+  File "dropbox/client_api/connection_hub.py", line 779, in request
+  File "dropbox/client_api/connection_hub.py", line 1041, in _read_response
+HTTP504Error: ("Bad return status 504 (url 'get_support_action_bolt_info') (data '[redacted]')", 504)
+
