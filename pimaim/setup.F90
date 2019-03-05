@@ -121,6 +121,7 @@ if( iam .eq. 0 ) then
 open (21,file='eng1.out',status='new')
 open (22,file='velocities.out',status='new')
 open (23,file='positions.out',status='new')
+open (24,file='dipoles.out',status='new')
 open (25,file='eng2.out',status='new')
 open (30,file='kintemp.out',status='new')
 open (32,file='celleng.out',status='new')
@@ -128,7 +129,8 @@ open (33,file='engtot.out',status='new')
 open (34,file='pzeta.out',status='new')
 open (36,file='commomentum.out',status='new')
 open (44,file='bzeta.out',status='new')
-!open (41,file='disp.out',status='new')         !!MABC: this file gets too big!
+open (41,file='disp.out',status='new')         !!MABC: this file gets too big!
+open (48,file='forces.out',status='new')
 open (51,file='pres_diag.out',status='new')
 open (52,file='pressure.out',status='new')
 open (53,file='celllens.out',status='new')

@@ -34,8 +34,9 @@ contains
     recip_del_r = 1 / del_r 
 
 ! should use eta and cutoff ( eta * rcut) - 8.0 should be sufficient 
-    maxtable =  int (132.0 / del_r ) 
-!    maxtable =  100000 
+!    maxtable =  int (132.0 / del_r )
+!    print*,"max_table",maxtable 
+    maxtable =  10000000 
     allocate (erfc_table(maxtable)) 
     do i = 1, maxtable 
       r = r + del_r
@@ -63,7 +64,7 @@ contains
     r1 = x * recip_del_r  
     ir = int (r1)     
     r2 = r1 - float(ir) 
-
+    print*,"ir",ir,ir>size(erfc_table)
     erfunc = erfc_table(ir) - r2*(erfc_table(ir) - erfc_table (ir+1)) 
 
 ! alternative use direct calls to erfc function - intrinsic, gerfc, original
