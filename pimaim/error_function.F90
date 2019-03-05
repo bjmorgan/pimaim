@@ -9,7 +9,7 @@ Module error_function
 
     implicit none
     double precision, allocatable :: erfc_table(:) 
-    double precision :: del_r = 0.000025
+    double precision :: del_r = 0.00025
     double precision :: recip_del_r 
 
 contains 

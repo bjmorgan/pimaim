@@ -339,7 +339,6 @@ endif
 !#ifdef debug 
    if( iam .eq. 0 ) then
       do i=1,num
-         !print*,"Here i am"
          write(48,*)frrx(i),frry(i),frrz(i)
       enddo
    endif
