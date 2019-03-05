@@ -336,13 +336,14 @@ endif
 !Call routine to move the ions according to NVE,NVT or NPT ensembles...
    call trans_vv
 
-#ifdef debug 
+!#ifdef debug 
    if( iam .eq. 0 ) then
       do i=1,num
+         !print*,"Here i am"
          write(48,*)frrx(i),frry(i),frrz(i)
       enddo
    endif
-#endif 
+!#endif 
 
 ! ****** Periodic parts of main loop ******
 !

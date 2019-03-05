@@ -164,7 +164,13 @@ if(pervel) then
       write(60,*) hlab3(1,1)*x(i)+hlab3(1,2)*y(i)+hlab3(1,3)*z(i), &
                   hlab3(2,1)*x(i)+hlab3(2,2)*y(i)+hlab3(2,3)*z(i), &
                   hlab3(3,1)*x(i)+hlab3(3,2)*y(i)+hlab3(3,3)*z(i)
-   enddo   
+   enddo  
+      if (dippimlog) then
+         do i=1, num
+            write(24,*) xmu(i), ymu(i), zmu(i)
+         enddo
+      endif
+
 endif
 
 if(perfric) then

@@ -14,7 +14,7 @@ DOUBLE PRECISION, DIMENSION(num) :: resx,resy,resz,pdirx,pdiry,pdirz
 DOUBLE PRECISION, DIMENSION(num) :: Apx,Apy,Apz
 DOUBLE PRECISION :: res2,res2old,cgalpha,cgbeta,pAp,dipsq
 INTEGER :: i,j,ipoint,m,n
-INTEGER, PARAMETER :: itmax=50
+INTEGER, PARAMETER :: itmax=100
       
 ! the rhs of the equation to be solved are the 'charge induced' dipoles
 brhsx=elecxq*alppolar
