@@ -51,7 +51,7 @@ Integer :: i
   time21 = mpi_wtime()
   time22 = time21 - time20
   if( iam .eq. 0 ) then
-     write(*,'(a,F20.8,a)') ' Real     Time : ',time22,' (Sec.)'
+     write(6,'(a,F20.8,a)') ' Real     Time : ',time22,' (Sec.)'
   endif
 #endif 
 
@@ -67,7 +67,7 @@ Integer :: i
   time21 = mpi_wtime()
   time22 = time21 - time20
   if( iam .eq. 0 ) then
-     write(*,'(a,F20.8,a)') ' Recip E  Time : ',time22,' (Sec.)'
+     write(6,'(a,F20.8,a)') ' Recip E  Time : ',time22,' (Sec.)'
   endif
 #endif 
 
@@ -81,7 +81,7 @@ Integer :: i
   time21 = mpi_wtime()
   time22 = time21 - time20
   if( iam .eq. 0 ) then
-     write(*,'(a,F20.8,a)') ' Short R  Time : ',time22,' (Sec.)'
+     write(6,'(a,F20.8,a)') ' Short R  Time : ',time22,' (Sec.)'
   endif
 #endif 
 
@@ -189,7 +189,7 @@ engpetot = scctmp(55) + scctmp(56) + scctmp(57) + scctmp(58) + scctmp(59)
 
 !#ifdef debug
   if( iam .eq. 0 ) then
-    write(*,'(a,6(F15.8,X))') ' Energy = : ',engpetot, (scctmp(i),i=55,59) 
+    write(6,'(a,6(F15.8,X))') ' Energy = : ',engpetot, (scctmp(i),i=55,59) 
   endif
 !#endif 
 

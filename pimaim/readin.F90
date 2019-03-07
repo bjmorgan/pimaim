@@ -601,9 +601,9 @@ endif
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
-write (*,*)
-write (*,*) '**** Run-time parameters read in ****'
-write (*,*)
+write (6,*)
+write (6,*) '**** Run-time parameters read in ****'
+write (6,*)
 
 endif
 !---> Parallelization_E

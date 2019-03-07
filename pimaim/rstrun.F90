@@ -33,7 +33,7 @@ open(35,file='restart.dat',status='old')
 !---> Parallelization_S
       if( iam .eq. 0 ) then
 
-      write(*,*)'No coordinate information in restart file!'
+      write(6,*)'No coordinate information in restart file!'
 
       endif
       call mpi_finalize(ierr)
@@ -80,8 +80,8 @@ open(35,file='restart.dat',status='old')
 !---> Parallelization_S
          if( iam .eq. 0 ) then
 
-         write(*,*)'Warning: No dipole variables read in,'
-         write(*,*)'         and no annealing is scheduled.'
+         write(6,*)'Warning: No dipole variables read in,'
+         write(6,*)'         and no annealing is scheduled.'
 
          endif
 !<--- Parallelization_E
@@ -148,9 +148,9 @@ open(50,file='startuppos.out',status='new')
    enddo
 close(50)
 
-write(*,*)
-write(*,*)'**** Run restarted ****'
-write(*,*)
+write(6,*)
+write(6,*)'**** Run restarted ****'
+write(6,*)
 
 endif
 !<--- Parallelization_E

@@ -266,7 +266,7 @@ if(dippimlog.and.conjgradlog) call dipcg
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
-if((.not.relaxconfig).or.verbose) write(*,*)'ENVPIM', abs(engtemp-engpetot),engtol
+if((.not.relaxconfig).or.verbose) write(6,*)'ENVPIM', abs(engtemp-engpetot),engtol
 
 endif
 !<--- Parallelization_E
@@ -300,9 +300,9 @@ if(verbose)then
 endif
 
 if((.not.relaxconfig).or.verbose) then
- write(*,*)
- write(*,*)'**** Anion annealing completed ****'
- write(*,*)
+ write(6,*)
+ write(6,*)'**** Anion annealing completed ****'
+ write(6,*)
 end if
 
 endif

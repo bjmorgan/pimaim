@@ -29,7 +29,7 @@ FP=FUNCAIM(P)
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
-if(verbose) write(*,*)'iteration 0',FP
+if(verbose) write(6,*)'iteration 0',FP
 
 endif
 !<--- Parallelization_E
@@ -68,7 +68,7 @@ DO ITS=1,ITMAX
 !---> Parallelization_S
    if( iam .eq. 0 ) then
 
-   if(verbose) write(*,*)'iteration',ITS,FP
+   if(verbose) write(6,*)'iteration',ITS,FP
 
    endif
 !<--- Parallelization_E

@@ -90,9 +90,9 @@ do i=1,num
    write(18,*)xi(i),xi(i+num),xi(i+2*num)
 enddo   
 
-write(*,*)
-write(*,*)'**** Ion annealing completed ****'
-write(*,*)
+write(6,*)
+write(6,*)'**** Ion annealing completed ****'
+write(6,*)
 
 endif
 !---> Parallelization_E

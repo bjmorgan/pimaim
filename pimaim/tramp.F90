@@ -15,7 +15,7 @@ IMPLICIT NONE
 DOUBLE PRECISION :: relaxsq,relaxsqrec,gtran
 
 trantemp=trantemp+deltatramp
-if(iam.eq.0) write(*,*) 'T ramp: temperature set to ',trantemp,'K.'
+if(iam.eq.0) write(6,*) 'T ramp: temperature set to ',trantemp,'K.'
 trantkb=boltz*trantemp
 !
 ! Thermostat parameters.

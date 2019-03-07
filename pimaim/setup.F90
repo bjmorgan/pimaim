@@ -152,7 +152,7 @@ call date_and_time(values=time_array)           !MABC: New seed for random numbe
     !do i = 7, 8
     ! write(*,*) iseed, time_array(i)
      iseed = time_array(7)+time_array(6)
-     write(*,*) iseed
+     write(6,*) iseed
     !end do
 
 dummy=ran1(-iseed)

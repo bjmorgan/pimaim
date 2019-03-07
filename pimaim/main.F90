@@ -14,58 +14,66 @@ use mpipara
 
 IMPLICIT NONE
 
+
 LOGICAL :: endrun, shutdown
 
-INTEGER :: nnn,i
-
+INTEGER :: nnn,i,id_in_group,excode, comm_size, parent, rank,send_data
 double precision :: time0, time1, time2
 
 call mpi_init(ierr)
 call mpi_comm_size(mpi_comm_world,nprocs,ierr)
 call mpi_comm_rank(mpi_comm_world,iam,ierr)
+call mpi_COMM_get_parent(parent,ierr)
 
 time0 = mpi_wtime()
 
+if((iam .eq. 0) .and. (parent .ne. mpi_comm_null)) then
+     open(unit=6, file="OUT.OUT")
+endif
+
 if (iam.eq.0) then
 
-  write(*,*) '****************************************************************'
-  write(*,*) '*                                                              *'
-  write(*,*) '*                                                              *'
-  write(*,*) '*         ######   ###  #     #     #     ###  #     #         *'
-  write(*,*) '*         #     #   #   ##   ##    # #     #   ##   ##         *'
-  write(*,*) '*         #     #   #   # # # #   #   #    #   # # # #         *'
-  write(*,*) '*         ######    #   #  #  #  #     #   #   #  #  #         *'
-  write(*,*) '*         #         #   #     #  #######   #   #     #         *'
-  write(*,*) '*         #         #   #     #  #     #   #   #     #         *'
-  write(*,*) '*         #        ###  #     #  #     #  ###  #     #         *'
-  write(*,*) '*                                                              *'
-  write(*,*) '*                           Version 2.1                        *'
-  write(*,*) '*                                                              *'
-  write(*,*) '*      maintained by Prof G. Watson, TCD (watsong@tcd.ie)      *'
-  write(*,*) '*                                                              *'
-  write(*,*) '****************************************************************'
-  write(*,*) ' '
-  write(*,*) '     A molecular dynamics code orgininally developed in the '
-  write(*,*) '         group of Prof. Paul Madden at Oxford University'
-  write(*,*) ' '
-  write(*,*) ' '
-  write(*,*) ' Recently updates at TCD'
-  write(*,*) '    1) Rewrite of the Ewald cutoff in the correct units and to '
-  write(*,*) '       and to ensure equal accuracy in real and reciprical space'
-  write(*,*) ' '
-  write(*,*) '    2) Rewrite of van der Waals interaction to include correct '
-  write(*,*) '       energetics when using damping and the Ewald summation'
-  write(*,*) ' '
-  write(*,*) '    3) Combination of all energy routines charge, dipole and'
-  write(*,*) '       quadrupole into a single routine with conditional '
-  write(*,*) '       compilation'
-  write(*,*) ' '
-  write(*,*) '    4) New compilation systems allowing condition electrostatics,'
-  write(*,*) '       van der walls, debugging etc.'
-  write(*,*) ' '
-  write(*,*) ' Version 2.1 - maintained by Prof G. Watson, TCD (watsong@tcd.ie)'
-  write(*,*) ' '
-  write(*,*) ' '
+  write(6,*) '****************************************************************'
+  write(6,*) '*                                                              *'
+  write(6,*) '*                                                              *'
+  write(6,*) '*         ######   ###  #     #     #     ###  #     #         *'
+  write(6,*) '*         #     #   #   ##   ##    # #     #   ##   ##         *'
+  write(6,*) '*         #     #   #   # # # #   #   #    #   # # # #         *'
+  write(6,*) '*         ######    #   #  #  #  #     #   #   #  #  #         *'
+  write(6,*) '*         #         #   #     #  #######   #   #     #         *'
+  write(6,*) '*         #         #   #     #  #     #   #   #     #         *'
+  write(6,*) '*         #        ###  #     #  #     #  ###  #     #         *'
+  write(6,*) '*                                                              *'
+  write(6,*) '*                           Version 2.1                        *'
+  write(6,*) '*                                                              *'
+  write(6,*) '*      maintained by Prof G. Watson, TCD (watsong@tcd.ie)      *'
+  write(6,*) '*                                                              *'
+  write(6,*) '****************************************************************'
+  write(6,*) ' '
+  write(6,*) '     A molecular dynamics code orgininally developed in the '
+  write(6,*) '         group of Prof. Paul Madden at Oxford University'
+  write(6,*) ' '
+  write(6,*) ' '
+  write(6,*) ' Recently updates at TCD'
+  write(6,*) '    1) Rewrite of the Ewald cutoff in the correct units and to '
+  write(6,*) '       and to ensure equal accuracy in real and reciprical space'
+  write(6,*) ' '
+  write(6,*) '    2) Rewrite of van der Waals interaction to include correct '
+  write(6,*) '       energetics when using damping and the Ewald summation'
+  write(6,*) ' '
+  write(6,*) '    3) Combination of all energy routines charge, dipole and'
+  write(6,*) '       quadrupole into a single routine with conditional '
+  write(6,*) '       compilation'
+  write(6,*) ' '
+  write(6,*) '    4) New compilation systems allowing condition electrostatics,'
+  write(6,*) '       van der walls, debugging etc.'
+  write(6,*) ' '
+  write(6,*) ' Version 2.1 - maintained by Prof G. Watson, TCD (watsong@tcd.ie)'
+  write(6,*) ' '
+  write(6,*) ' '
+  CALL MPI_GET_PROCESSOR_NAME(HOSTNAME,hostlength, hosterror)
+  write(6,*) '                  Running on host: ',trim(hostname),'            '
+
 
 endif 
 
@@ -239,13 +247,13 @@ endif
   if(rescalelog) then
     if(.not. velinit .and. .not. restart) then
       if( iam .eq. 0 ) then
-        write (*,*) 'Cannot rescale from zero temperature!'
+        write (6,*) 'Cannot rescale from zero temperature!'
       endif
       call mpi_finalize(ierr)
       stop
     endif
     if( iam .eq. 0 ) then
-      write(*,*) 'rescale called.' 
+      write(6,*) 'rescale called.' 
     endif
     call rescale
   endif
@@ -254,7 +262,7 @@ endif
 forfl=.false.
 
   if( iam .eq. 0 ) then
-    write(*,*) 'main loop begun'
+    write(6,*) 'main loop begun'
   endif
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -317,7 +325,7 @@ endif
 
     if( iam .eq. 0 ) then
       if(mod(nstep,20).eq.0)then
-        write (*,*) nstep
+        write (6,*) nstep
       endif
     endif
 
@@ -327,7 +335,7 @@ endif
       call rescale
 #ifdef debug
         if( iam .eq. 0 ) then
-          write(*,*)'Rescale called'
+          write(6,*)'Rescale called'
         endif
 #endif 
       endif
@@ -494,8 +502,15 @@ endif
   time1 = mpi_wtime()
   time2 = time1 - time0
   if( iam .eq. 0 ) then
-    write(*,'(a,F20.8,a)') ' Elapsed Time : ',time2,' (Sec.)'
+    write(6,'(a,F20.8,a)') ' Elapsed Time : ',time2,' (Sec.)'
   endif
+
+  call flush()
+
+if (parent .ne. MPI_COMM_NULL) then
+    call MPI_BARRIER(parent,ierr)
+    call MPI_COMM_DISCONNECT(parent,ierr)
+end if
 
 ! GWW - close down MIP and stop 
   call mpi_finalize(ierr)

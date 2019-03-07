@@ -63,9 +63,9 @@ do i=1,nspec
    enddo   
 enddo   
 
-write(*,*)
-write(*,*) '**** Radial distribution function written out ****'
-write(*,*)
+write(6,*)
+write(6,*) '**** Radial distribution function written out ****'
+write(6,*)
 
 return
 END SUBROUTINE

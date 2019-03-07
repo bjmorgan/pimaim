@@ -64,7 +64,6 @@ contains
     r1 = x * recip_del_r  
     ir = int (r1)     
     r2 = r1 - float(ir) 
-    print*,"ir",ir,ir>size(erfc_table)
     erfunc = erfc_table(ir) - r2*(erfc_table(ir) - erfc_table (ir+1)) 
 
 ! alternative use direct calls to erfc function - intrinsic, gerfc, original

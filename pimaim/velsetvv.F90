@@ -31,9 +31,9 @@ call rescale
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
-write(*,*)
-write(*,*)'**** Velocities set up ****'
-write(*,*)
+write(6,*)
+write(6,*)'**** Velocities set up ****'
+write(6,*)
 
 endif
 !<--- Parallelization_E

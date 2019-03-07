@@ -319,6 +319,8 @@ double precision, allocatable, dimension(:)     :: sctmp,scctmp
 double precision, allocatable, dimension(:,:)   :: dimtmp
 double precision, allocatable, dimension(:)     :: rdftot_w
 double precision, allocatable, dimension(:,:,:) :: rdfpart_w
+CHARACTER(len=256)::hostname
+INTEGER:: hosterror, hostlength
 
 end module mpipara
 !<--- Parallelization_E

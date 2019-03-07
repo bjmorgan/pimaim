@@ -28,7 +28,7 @@ endif
 #####################################################################################################################
 # INTEL
 
- FC  =    mpiifort 
+ FC  =    mpif90 
 # FC  =    mpif90    -fp-model precise 
 
  FPP          =    fpp -free -f90  $(FPP_OPTIONS)   
@@ -36,18 +36,20 @@ endif
 
 ifeq ($(DEBUG),TRUE) 
 # Debug compile 
- FFLAGS =   -g -save-temps -check all -traceback  -O0 -extend-source 132 -mcmodel=medium -shared-intel -warn all -assume noold_unit_star  -fpe3  #-openmp 
+ FFLAGS =    -O3  -ffree-form -ffree-line-length-none
+ #-g -save-temps -check all -traceback  -O0 -extend-source 132 -mcmodel=medium -shared-intel -warn all -assume noold_unit_star  -fpe3  #-openmp 
 
 else
 # optimised compiled 
- FFLAGS =    -O2 -save-temps  -extend-source 132 -mcmodel=medium -shared-intel #-align array32byte #-ipo # -openmp # -openmp-report=2 # -vec-report5
+ FFLAGS =     -O3  -ffree-form -ffree-line-length-none
+ #-O2 -save-temps  -extend-source 132 -mcmodel=medium -shared-intel #-align array32byte #-ipo # -openmp # -openmp-report=2 # -vec-report5
 # FFLAGS =    -O3 -save-temps  -extend-source 132 -mcmodel=medium -shared-intel -align array32byte -ipo # -openmp # -openmp-report=2 # -vec-report5
 
 endif 
 
 
 
- LDFLAGS =    -mcmodel=medium -shared-intel #-lefence #-openmp 
+ LDFLAGS =    -mcmodel=medium #-shared-intel #-lefence #-openmp 
 #
 
 

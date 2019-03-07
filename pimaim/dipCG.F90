@@ -40,7 +40,7 @@ do j=1,itmax
 !---> Parallelization_S
    if( iam .eq. 0 ) then
 
-   if(verbose) write(*,'(a,i4,1x,a,f20.14,1x,a,1x,f20.14,1x,a,i4)')'j=',j,'convergence=',dsqrt(res2/real(num,8)),'ftl',ftol,'num=',num
+   if(verbose) write(6,'(a,i4,1x,a,f20.14,1x,a,1x,f20.14,1x,a,i4)')'j=',j,'convergence=',dsqrt(res2/real(num,8)),'ftl',ftol,'num=',num
 
    endif
 !---> Parallelization_E
@@ -108,7 +108,7 @@ if( iam .eq. 0 ) then
     do i = 1,num
       write (10,'(i6,1x,3(f15.8,2x))') i, xmu(i), ymu(i), zmu(i)
     enddo
-write(*,*)'cg failed to converge - stopping ' 
+write(6,*)'cg failed to converge - stopping ' 
 
 endif
 !---> Parallelization_E

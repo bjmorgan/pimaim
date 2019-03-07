@@ -48,7 +48,7 @@ DO ITS=1,ITMAX
    ITER=ITS
    CALL LINMINSTRUCT(P,XI,FRET)
 
-   if(iam.eq.0) write (*,*)' Linmin -', FRET 
+   if(iam.eq.0) write (6,*)' Linmin -', FRET 
    IF(2.*ABS(FRET-FP).LE.FTOLSTRUC*(ABS(FRET)+ABS(FP)+EPS)) THEN
       icounter=icounter+1
    ELSE
@@ -58,7 +58,7 @@ DO ITS=1,ITMAX
 !---> Parallelization_S
    if( iam .eq. 0 ) then
 
-   write(*,*) 'ITS,E,dE,tol:',ITS,real(FRET),real(FRET-FP),real(FTOLSTRUC*(ABS(FRET)+ABS(FP))/2.0d0)
+   write(6,*) 'ITS,E,dE,tol:',ITS,real(FRET),real(FRET-FP),real(FTOLSTRUC*(ABS(FRET)+ABS(FP))/2.0d0)
 
      if(relaxcell) then
        write(745,*) ITS,real(boxlenx),real(boxleny),real(boxlenz)
@@ -153,7 +153,7 @@ ENDDO
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
-write(*,*) 'FRPRSTRUCT maximum iterations exceeded'
+write(6,*) 'FRPRSTRUCT maximum iterations exceeded'
 
 endif
 !<--- Parallelization_E
