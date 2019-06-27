@@ -193,9 +193,9 @@ do j=jst,jed
 ! C6 terms using rules hene C22 is not done the same in real and reciprical.
 ! In addition there is not sign of damping in the reciprical space term
 ! rather shite really
-! Will have to come back and see if I can fix the reciprical space ewald vdw
-! at some poitn - but for now provide the possibility of a real space using the
-! input parameters and actually using the damping !
+
+! GWW fixed. Ewald VDW now done on seperate Cij terms and including damping. 
+ 
       dispexp=exp(-dispalpsq*drsq)
       cpe1  = -ftc(ipoint,jpoint)*dispexp* &
                (dr4rec+dispalpsq*drsqrec+dispalp4*0.5d0)*drsqrec

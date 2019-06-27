@@ -11,7 +11,7 @@
 #
 
 # FPP options 
- FPP_BASE_OPTIONS  =   # -Dvdw_ewald # -Ddebug -Dlight_scattering -Ddebye_scherer 
+ FPP_BASE_OPTIONS  =    -Dvdw_ewald  # -Ddebug -Dlight_scattering -Ddebye_scherer 
 # FPP_OPTIONS  =  
 #
 

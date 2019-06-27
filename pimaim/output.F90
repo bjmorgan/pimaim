@@ -24,7 +24,7 @@ USE commondata, ONLY: pereng,dippimlog,num,reseng,quadpimlog,dipsqeng, &
                       quaimxz,quaimyz,selfeps,selfquaim,pervel,perfric,nmon, &
                       engeff,dtime, amass, chg, atmnam, weight,chge,frrx,frry,&
 		      frrz,nunitcellx,nunitcelly,nunitcellz,istrj,jstrj,keytrj,&
-                      jobname 
+                      jobname, verbose
 USE boxdata, ONLY: cellvol3rec,cellvol,boxlenx,boxleny,boxlenz,bee,hlab3,h,a0,b0,c0
 
 IMPLICIT NONE
@@ -165,7 +165,27 @@ if(pervel) then
                   hlab3(2,1)*x(i)+hlab3(2,2)*y(i)+hlab3(2,3)*z(i), &
                   hlab3(3,1)*x(i)+hlab3(3,2)*y(i)+hlab3(3,3)*z(i)
    enddo   
+
+
+  if(verbose)then
+    do i=1,num
+      write(46,'(3(F22.12,2X))')xmu(i),ymu(i),zmu(i)
+      write(47,'(6(F22.12,2X))')quadxx(i),quadyy(i),quadzz(i),quadxy(i),quadxz(i),quadyz(i)
+      write(48,'(3(F22.12,2X))')frrx(i),frry(i),frrz(i)
+      write(49,'(4(F22.12,2X))')real(alppolar(i)),real(Bpolar(i)) &
+                ,real(Cpolar(i)),real(gammapolar(i))
+    enddo   
+  endif
+
+
 endif
+
+
+
+
+
+
+
 
 if(perfric) then
    perfric=.false.

@@ -40,7 +40,7 @@ do j=jst,jed
 
       numx = numadr(i,j)
 
-! GWW convert to cartisain by mnultiplying by strain distortion matrix (det(h)=1) 
+! GWW convert to cartisain by multiplying by strain distortion matrix (det(h)=1) 
       dxsav(numx)=hlab2(1,1)*dxcf+hlab2(1,2)*dycf+hlab2(1,3)*dzcf
       dysav(numx)=hlab2(2,1)*dxcf+hlab2(2,2)*dycf+hlab2(2,3)*dzcf
       dzsav(numx)=hlab2(3,1)*dxcf+hlab2(3,2)*dycf+hlab2(3,3)*dzcf

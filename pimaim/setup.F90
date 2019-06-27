@@ -127,8 +127,17 @@ open (32,file='celleng.out',status='new')
 open (33,file='engtot.out',status='new')
 open (34,file='pzeta.out',status='new')
 open (36,file='commomentum.out',status='new')
+open (41,file='disp.out',status='new')    
 open (44,file='bzeta.out',status='new')
-!open (41,file='disp.out',status='new')         !!MABC: this file gets too big!
+
+! GWW
+! forcefield fitting output
+open (46,file='dipoles.out',status='new')
+open (47,file='quads.out',status='new')
+open (48,file='forces.out',status='new')
+open (49,file='polar.out',status='new')
+
+
 open (51,file='pres_diag.out',status='new')
 open (52,file='pressure.out',status='new')
 open (53,file='celllens.out',status='new')

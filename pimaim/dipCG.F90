@@ -14,7 +14,7 @@ DOUBLE PRECISION, DIMENSION(num) :: resx,resy,resz,pdirx,pdiry,pdirz
 DOUBLE PRECISION, DIMENSION(num) :: Apx,Apy,Apz
 DOUBLE PRECISION :: res2,res2old,cgalpha,cgbeta,pAp,dipsq
 INTEGER :: i,j,ipoint,m,n
-INTEGER, PARAMETER :: itmax=50
+INTEGER, PARAMETER :: itmax=100
       
 ! the rhs of the equation to be solved are the 'charge induced' dipoles
 brhsx=elecxq*alppolar
@@ -62,8 +62,13 @@ do j=1,itmax
       enddo
       return
    endif
+
+! GWW 
+! cg directio does not seem great far from the minimum. Reset back to gradient every 10 steps seems to help significantly 
+
 ! find the new search direction
-   if(j.eq.1) then
+!   if(j.eq.1) then
+   if(mod(j,10).eq.1) then
       pdirx=resx
       pdiry=resy
       pdirz=resz

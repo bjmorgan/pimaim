@@ -23,7 +23,7 @@ contains
     double precision :: r 
     integer  ::  maxtable, i 
 
-! GWW code is absolutely fucking stupid - calculating error function for all
+! GWW code is absolutely stupid - calculating error function for all
 ! pairs irrespecive of the distance - so calculted for pairs well outside the 
 ! requirements ! 
 ! REALLY STUPID 
