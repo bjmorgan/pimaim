@@ -168,18 +168,42 @@ if(pervel) then
 
 endif
 
+! write out if verbose true - mainly for forcefield fitting 
 if(verbose)then
+    write(45,'(i8)') num 
     write(46,'(i8)') num 
     write(47,'(i8)') num 
     write(48,'(i8)') num 
     write(49,'(i8)') num 
   do i=1,num
+! dipole 
     write(46,'(3(F22.12,2X))')xmu(i),ymu(i),zmu(i)
+! quadrupole
     write(47,'(6(F22.12,2X))')quadxx(i),quadyy(i),quadzz(i),quadxy(i),quadxz(i),quadyz(i)
+! forces
     write(48,'(3(F22.12,2X))')frrx(i),frry(i),frrz(i)
     write(49,'(4(F22.12,2X))')real(alppolar(i)),real(Bpolar(i)) &
                ,real(Cpolar(i)),real(gammapolar(i))
   enddo   
+
+! stresses (xx, yy, zz, xy, xz, yz)
+  write (45,'(6(F22.12,2X))') real((stpxx+stcxx+stsrxx+ &
+                 stp2xx+stpsrxx+stpqquadxx+stpdipquadxx+ &
+                 stpquadquadxx+stqsrxx)/cellvol),real(( &
+                 stpyy+stcyy+stsryy+stp2yy+stpsryy+ &
+                 stpqquadyy+stpdipquadyy+stpquadquadyy+ &
+                 stqsryy)/cellvol),real((stpzz+stczz+stsrzz+ &
+                 stp2zz+stpsrzz+stpqquadzz+stpdipquadzz+ &
+                 stpquadquadzz+stqsrzz)/cellvol+stewzz), &
+                 real((stpxy+stcxy+stsrxy+ &
+                 stp2xy+stpsrxy+stpqquadxy+stpdipquadxy+ &
+                 stpquadquadxy+stqsrxy)/cellvol) &
+                ,real((stpxz+stcxz+stsrxz+stp2xz+stpsrxz+ &
+                 stpqquadxz+stpdipquadxz+stpquadquadxz+ &
+                 stqsrxz)/cellvol),real((stpyz+stcyz+stsryz+ &
+                 stp2yz+stpsryz+stpqquadyz+stpdipquadyz+ &
+                 stpquadquadyz+stqsryz)/cellvol)
+!
 endif
 
 

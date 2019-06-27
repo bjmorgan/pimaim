@@ -132,6 +132,7 @@ open (44,file='bzeta.out',status='new')
 
 ! GWW
 ! forcefield fitting output
+open (45,file='stresses.out',status='new')
 open (46,file='dipoles.out',status='new')
 open (47,file='quads.out',status='new')
 open (48,file='forces.out',status='new')
