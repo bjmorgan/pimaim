@@ -336,11 +336,11 @@ endif
 !Call routine to move the ions according to NVE,NVT or NPT ensembles...
    call trans_vv
 
-   if( iam .eq. 0 .and. verbose ) then
-      do i=1,num
-         write(48,*)frrx(i),frry(i),frrz(i)
-      enddo
-   endif
+!   if( iam .eq. 0 .and. verbose ) then
+!      do i=1,num
+!         write(48,*)frrx(i),frry(i),frrz(i)
+!      enddo
+!   endif
 
 ! ****** Periodic parts of main loop ******
 !

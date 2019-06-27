@@ -260,15 +260,18 @@ if(dippimlog) call dipcg
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
-if(verbose)then
-   do i=1,num
-      write(45,*)xmu(i),ymu(i),zmu(i)
-      write(46,*)quadxx(i),quadyy(i),quadzz(i)
-      write(47,*)quadxy(i),quadxz(i),quadyz(i)
-      write(49,*)real(alppolar(i)),real(Bpolar(i)) &
-                ,real(Cpolar(i)),real(gammapolar(i))
-   enddo   
-endif
+! GWW 
+! moved to output 
+
+!if(verbose)then
+!   do i=1,num
+!      write(45,*)xmu(i),ymu(i),zmu(i)
+!      write(46,*)quadxx(i),quadyy(i),quadzz(i)
+!      write(47,*)quadxy(i),quadxz(i),quadyz(i)
+!      write(49,*)real(alppolar(i)),real(Bpolar(i)) &
+!                ,real(Cpolar(i)),real(gammapolar(i))
+!   enddo   
+!endif
 
 !write(*,*)
 !write(*,*)'**** Anion annealing completed ****'

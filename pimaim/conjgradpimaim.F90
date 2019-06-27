@@ -288,16 +288,16 @@ quaimyz=p(9*num+1:10*num)
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
-if(verbose)then
-   do i=1,num
-      if(environmentalaimlog)write(43,*)delta(i),selfeps(i),selfquaim(i)
-      write(45,*)xmu(i),ymu(i),zmu(i)
-      write(46,*)quadxx(i),quadyy(i),quadzz(i)
-      write(47,*)quadxy(i),quadxz(i),quadyz(i)
-      write(49,*)real(alppolar(i)),real(Bpolar(i)) &
-                ,real(Cpolar(i)),real(gammapolar(i))
-   enddo   
-endif
+!if(verbose)then
+!   do i=1,num
+!      if(environmentalaimlog)write(43,*)delta(i),selfeps(i),selfquaim(i)
+!      write(45,*)xmu(i),ymu(i),zmu(i)
+!      write(46,*)quadxx(i),quadyy(i),quadzz(i)
+!      write(47,*)quadxy(i),quadxz(i),quadyz(i)
+!      write(49,*)real(alppolar(i)),real(Bpolar(i)) &
+!                ,real(Cpolar(i)),real(gammapolar(i))
+!   enddo   
+!endif
 
 if((.not.relaxconfig).or.verbose) then
  write(*,*)
