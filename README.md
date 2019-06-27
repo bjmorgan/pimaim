@@ -18,7 +18,7 @@ Object code is stored in a subdirectory so you can have a number of compilations
 
 Changes in this branch
 
-Modified output of paramters for potential fitting - triggered by seeting verbose true in runtime.inpt 
+Modified output of paramters for potential fitting - triggered by setting verbose true in runtime.inpt 
 
 outputfiles 
 
