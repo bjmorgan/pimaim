@@ -323,7 +323,6 @@ forfl=.false.
 #ifndef ppfit    
     if( iam .eq. 0 ) call dump
 #endif
-    print*,"in relaxconfig"
       call close_down_mpi()
     stop
   endif
@@ -356,7 +355,6 @@ if(nrun.eq.0) then
 #ifndef ppfit
    if( iam .eq. 0 ) call dump
 #endif
-   print*,"in static"
    call close_down_mpi()
 !<--- Parallelization_E
    stop
@@ -566,13 +564,11 @@ endif
 #ifdef ppfit
 end do !ppfit_step
 #endif
-  print*,"exited loop in pimaim - gonna close down"
   time1 = mpi_wtime()
   time2 = time1 - time0
   if( iam .eq. 0 ) then
     write(6,'(a,F20.8,a)') ' Elapsed Time : ',time2,' (Sec.)'
   endif
-  print*,"about to call final"
   call close_down_mpi()
   stop
 
