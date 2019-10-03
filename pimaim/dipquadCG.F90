@@ -7,10 +7,11 @@ USE commondata, ONLY: num,xmu,ymu,zmu,quadxx,quadyy,quadzz,quadxy,quadxz, &
                       ftol,xk1,xk2,xk3,xk4,polarizablelog,nspec,nsp,reseng, &
                       dipsqeng,dipquadeng,quadeng,delta,engpetot,verbose, &
                       environmentalaimlog,elecxq,elecyq,eleczq,exxq,eyyq,ezzq, &
-                      exyq,exzq,eyzq
+                      exyq,exzq,eyzq,exit_code
 
 !---> Parallelization_S
 use mpipara
+use mpi_spawn
 !<--- Parallelization_E
 
 IMPLICIT NONE
@@ -107,7 +108,7 @@ do j=1,itmax
       pdiryz=resyz+cgbeta*pdiryz
       if(cgbeta.gt.1.d0)then
 !---> Parallelization_S
-         if(iam.eq.0) write(*,*)'pim cg reset'
+         if(iam.eq.0) write(6,*)'pim cg reset'
 !<--- Parallelization_E
          pdirx=resx+0.5*cgbeta*pdirx
          pdiry=resy+0.5*cgbeta*pdiry
@@ -213,7 +214,7 @@ do j=1,itmax
                          resxy*resxy+resxz*resxz+resyz*resyz)
    cgbeta=max((res2num1-res2num2)/res2denom,0.d0)
 !---> Parallelization_S
-   if(verbose .and. iam.eq.0) write(*,*)j,dsqrt(res2num1/num),ftol
+   if(verbose .and. iam.eq.0) write(6,*)j,dsqrt(res2num1/num),ftol
 !<--- Parallelization_E
 ! can we stop now?      
    if(dsqrt(res2num1/num).lt.ftol) then
@@ -251,10 +252,13 @@ do j=1,itmax
    endif
 enddo
 !---> Parallelization_S
-if(iam.eq.0) write(*,*)'cg failed to converge'
-call mpi_finalize(ierr)
-call mpi_abort(ierr)
+
+exit_code  = 1
+#ifndef ppfit
+if(iam.eq.0) write(6,*)'cg failed to converge'
+call close_down_mpi()
 !<--- Parallelization_E
 STOP
+#endif
 RETURN
 END SUBROUTINE

@@ -12,6 +12,7 @@ SUBROUTINE rstrun
                    b,h3,hi3,fullh
 
   use mpipara
+  use mpi_spawn
 
   IMPLICIT NONE
 
@@ -52,7 +53,7 @@ SUBROUTINE rstrun
     rsqmax=rcut**2.0d0
 
     if (iam.eq.0.and.rsqmax.gt.halfboxminsq)  &
-            write(*,*)'WARNING - cut off large than half smallest box width'
+            write(6,*)'WARNING - cut off large than half smallest box width'
 
     call kset
 
@@ -76,7 +77,7 @@ SUBROUTINE rstrun
 
       do i=1,nspec
         if (nsp(i).ne.num_for_each_type(i)) then
-           if (iam.eq.0) write(*,*) 'WARNING - number of atoms of type ',i,' does not match runtime.inpt'
+           if (iam.eq.0) write(6,*) 'WARNING - number of atoms of type ',i,' does not match runtime.inpt'
        endif
       enddo 
 
@@ -87,10 +88,11 @@ SUBROUTINE rstrun
       enddo   
     else
       if( iam .eq. 0 ) then
-        write(*,*)'No coordinate information in restart file!'
-        write(*,*)'STOPPING !'
+        write(6,*)'No coordinate information in restart file!'
+        write(6,*)'STOPPING !'
       endif
-      call mpi_finalize(ierr)
+      exit_code = 1
+      call close_down_mpi()
       stop
     endif
 
@@ -117,7 +119,7 @@ SUBROUTINE rstrun
 ! or read the line but do not store - as at some point will only allocate
 ! appropriate storage for the run 
       else 
-        if( iam .eq. 0 ) write(*,*) 'WARNING - dipole data present but not a dipole run'
+        if( iam .eq. 0 ) write(6,*) 'WARNING - dipole data present but not a dipole run'
         do i=1,num
           read (35,'(A50)') dummy_string 
         enddo   
@@ -136,7 +138,7 @@ SUBROUTINE rstrun
 ! or read the line but do not store - as at some point will only allocate
 ! appropriate storage for the run 
       else 
-        if( iam .eq. 0 ) write(*,*) 'WARNING - quadrupole data present but not a quadrupole run'
+        if( iam .eq. 0 ) write(6,*) 'WARNING - quadrupole data present but not a quadrupole run'
         do i=1,num
           read (35,'(A50)') dummy_string 
           read (35,'(A50)') dummy_string 
@@ -156,7 +158,7 @@ SUBROUTINE rstrun
           read(35,*)delta(i)
         enddo   
       else
-        if( iam .eq. 0 ) write(*,*) 'WARNING - cim info but not a cim run'
+        if( iam .eq. 0 ) write(6,*) 'WARNING - cim info but not a cim run'
         read (35,'(A50)') dummy_string 
         do i=1,num
           read (35,'(A50)') dummy_string 
@@ -172,7 +174,7 @@ SUBROUTINE rstrun
           read(35,*)epsilonx(i),epsilony(i),epsilonz(i)
         enddo    
       else
-        if( iam .eq. 0 ) write(*,*) 'WARNING - daim info but not a daim run'
+        if( iam .eq. 0 ) write(6,*) 'WARNING - daim info but not a daim run'
         read (35,'(A50)') dummy_string 
         do i=1,num
           read (35,'(A50)') dummy_string 
@@ -189,7 +191,7 @@ SUBROUTINE rstrun
           read(35,*)quaimxy(i),quaimxz(i),quaimyz(i)
         enddo   
       else 
-        if( iam .eq. 0 ) write(*,*) 'WARNING - quaim info but not a quaim run'
+        if( iam .eq. 0 ) write(6,*) 'WARNING - quaim info but not a quaim run'
         read (35,'(A50)') dummy_string 
         do i=1,num
           read (35,'(A50)') dummy_string 
@@ -201,7 +203,7 @@ SUBROUTINE rstrun
 !
 
     if(.not.dip_input_log.and. .not. conjgradlog .and. .not. rimlog) then
-       if( iam .eq. 0 ) write(*,*)'WARNING No dipole data read in but a dipole run ' 
+       if( iam .eq. 0 ) write(6,*)'WARNING No dipole data read in but a dipole run ' 
     endif
 
     if(fullrun_input_log) then
@@ -233,9 +235,9 @@ SUBROUTINE rstrun
     close(35)
 
     if (iam.eq.0) then 
-      write(*,*)
-      write(*,*)'**** Run restarted ****'
-      write(*,*)
+      write(6,*)
+      write(6,*)'**** Run restarted ****'
+      write(6,*)
     endif 
 
   return

@@ -9,12 +9,12 @@ DOUBLE PRECISION, PARAMETER :: GOLD=1.618034, GLIMIT=100., TINY=1.E-20
 
 FA=F1DIMSTRUCT(AXX)
 
-if (iam.eq.0) write (*,*) 'AXX= ',AXX, BXX, CX  
-if (iam.eq.0) write (*,*) 'FA = ',FA, AXX 
+if (iam.eq.0) write (6,*) 'AXX= ',AXX, BXX, CX  
+if (iam.eq.0) write (6,*) 'FA = ',FA, AXX 
 
 FB=F1DIMSTRUCT(BXX)
 
-if (iam.eq.0) write (*,*) 'FB = ',FB, BXX
+if (iam.eq.0) write (6,*) 'FB = ',FB, BXX
 
 IF(FB.GT.FA)THEN
    DUM=AXX

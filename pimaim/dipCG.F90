@@ -2,9 +2,11 @@ SUBROUTINE dipcg
 
 USE commondata, ONLY: xmu,ymu,zmu,num,nspec,ntype,engeff,alppolar,alppolar1, &
                       alppolardel,alppolareff,elecx,elecy,elecz,ftol,xk1,nsp, &
-                      reseng,delta,polarizablelog,verbose,elecxq,elecyq,eleczq
+                      reseng,delta,polarizablelog,verbose,elecxq,elecyq,eleczq, &
+                      exit_code
 !---> Parallelization_S
 use mpipara
+use mpi_spawn
 !---> Parallelization_E
 
 IMPLICIT NONE
@@ -14,7 +16,7 @@ DOUBLE PRECISION, DIMENSION(num) :: resx,resy,resz,pdirx,pdiry,pdirz
 DOUBLE PRECISION, DIMENSION(num) :: Apx,Apy,Apz
 DOUBLE PRECISION :: res2,res2old,cgalpha,cgbeta,pAp,dipsq
 INTEGER :: i,j,ipoint,m,n
-INTEGER, PARAMETER :: itmax=50
+INTEGER, PARAMETER :: itmax=100
       
 ! the rhs of the equation to be solved are the 'charge induced' dipoles
 brhsx=elecxq*alppolar
@@ -26,6 +28,7 @@ resx=elecx*alppolar-xmu
 resy=elecy*alppolar-ymu
 resz=elecz*alppolar-zmu
 
+#ifndef ppfit
 if(verbose) then
   if( iam .eq. 0 ) then
     write (10,*) ' Initial residues' 
@@ -34,13 +37,14 @@ if(verbose) then
     enddo
   endif
 endif 
+#endif
 
 do j=1,itmax
    res2=SUM(resx*resx+resy*resy+resz*resz)
 !---> Parallelization_S
    if( iam .eq. 0 ) then
 
-   if(verbose) write(*,'(a,i4,1x,a,f20.14,1x,a,1x,f20.14,1x,a,i4)')'j=',j,'convergence=',dsqrt(res2/real(num,8)),'ftl',ftol,'num=',num
+   if(verbose) write(6,'(a,i4,1x,a,f20.14,1x,a,1x,f20.14,1x,a,i4)')'j=',j,'convergence=',dsqrt(res2/real(num,8)),'ftl',ftol,'num=',num
 
    endif
 !---> Parallelization_E
@@ -104,17 +108,24 @@ do j=1,itmax
 enddo
 !---> Parallelization_S
 if( iam .eq. 0 ) then
-
+#ifndef ppfit
     do i = 1,num
       write (10,'(i6,1x,3(f15.8,2x))') i, xmu(i), ymu(i), zmu(i)
     enddo
-write(*,*)'cg failed to converge - stopping ' 
+#endif
+write(6,*)'cg failed to converge - stopping ' 
 
 endif
+
 !---> Parallelization_E
 !---> Parallelization_S
-call mpi_finalize(ierr)
-!---> Parallelization_E
+exit_code  = 1
+#ifndef ppfit
+if(iam.eq.0) write(6,*)'cg failed to converge'
+call close_down_mpi()
+!<--- Parallelization_E
 STOP
-RETURN
+#endif
+
+
 END SUBROUTINE

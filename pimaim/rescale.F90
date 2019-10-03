@@ -78,9 +78,9 @@ enddo
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
-write(*,*)
-write(*,*)'**** Velocity rescaling complete ****'
-write(*,*)
+write(6,*)
+write(6,*)'**** Velocity rescaling complete ****'
+write(6,*)
 
 endif
 !<--- Parallelization_E

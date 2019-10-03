@@ -45,7 +45,8 @@ open(65,file='rdftot.out',status='new')
                rdfpart(i,ii,jj)=rdfpart(i,ii,jj)*2.0d0
             endif
          enddo   
-      enddo        
+      enddo   
+     
       write(65,*) rlower,rdftot(i)
    enddo   
 close(65)
@@ -63,9 +64,10 @@ do i=1,nspec
    enddo   
 enddo   
 
-write(*,*)
-write(*,*) '**** Radial distribution function written out ****'
-write(*,*)
+
+write(6,*)
+write(6,*) '**** Radial distribution function written out ****'
+write(6,*)
 
 return
 END SUBROUTINE

@@ -51,7 +51,7 @@ echo " "
            echo "Syntax is comp_pimaim <option1> <option2> "
            echo " " 
            echo "      <option1>  is rim, dipole or quadrupole or all"
-           echo "      <option2>  is debug "
+           echo "      <option2>  is debug  or ppfit"
            echo " " 
            echo " Example "
            echo " " 
@@ -86,6 +86,16 @@ echo " "
               fi 
            fi 
 
+           if [ "$2" == "ppfit" ]; then
+              dir="$1_$2"
+              if [ "$3" == "clean" ]; then
+                 removedir
+                 exit
+              fi
+           fi
+
+
+
            if [ "$1" == "allclean" ]; then 
               dir="rim"
               removedir 
@@ -99,6 +109,10 @@ echo " "
               removedir 
               dir="quadrupole_debug"
               removedir 
+              dir="dipole_ppfit"
+              removedir
+              dir="rim_ppfit"
+              removedir
               exit
            fi
 
@@ -123,7 +137,9 @@ rsync -arxH ../makefile_gww makefile
 
 
 if [ "$2" == "debug" ]; then
-   make TYPE=$1 DEBUG=TRUE  
+       make TYPE=$1 DEBUG=TRUE
+elif [ "$2" == "ppfit" ]; then
+       make TYPE=$1 PPFIT=TRUE
 else
    make TYPE=$1   
 fi    
@@ -135,6 +151,9 @@ fi
 exec="$pimaim$1"
 
 if [ "$2" == "debug" ] ;  then
+exec="$pimaim$1_$2"
+fi
+if [ "$2" == "ppfit" ] ;  then
 exec="$pimaim$1_$2"
 fi
 
