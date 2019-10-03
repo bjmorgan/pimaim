@@ -23,8 +23,8 @@ USE commondata, ONLY: pereng,dippimlog,num,reseng,quadpimlog,dipsqeng, &
                       epsilony,epsilonz,quaimxx,quaimyy,quaimzz,quaimxy, &
                       quaimxz,quaimyz,selfeps,selfquaim,pervel,perfric,nmon, &
                       engeff,dtime, amass, chg, atmnam, weight,chge,frrx,frry,&
-		      frrz,nunitcellx,nunitcelly,nunitcellz,istrj,jstrj,keytrj,&
-                      jobname 
+                      frrz,nunitcellx,nunitcelly,nunitcellz,istrj,jstrj,keytrj,&
+                      jobname,stress_tensor
 USE boxdata, ONLY: cellvol3rec,cellvol,boxlenx,boxleny,boxlenz,bee,hlab3,h,a0,b0,c0
 
 IMPLICIT NONE
@@ -40,6 +40,7 @@ if(pereng) then
    if(quadpimlog) polengtot=SUM(reseng+dipsqeng+dipquadeng+quadeng)
 ! energies
 !   write(21,*)nstep,real(engpetot),real(tranke)
+#ifndef ppfit
    write(21,*)nstep,engpetot,tranke
    write(32,*)nstep,real(tcell),real(tvol)
    write(34,*)nstep,real(tpzeta),real(pzeta)
@@ -81,28 +82,58 @@ if(pereng) then
                  stpquadquadxx+stpquadquadyy+stpquadquadzz+ &
                  stqsrxx+stqsryy+stqsrzz)* &
                  cellvol3rec+stewzz/3.0d0
+#endif
 !
 ! components: (xx, yy, zz)
-!
-   write (57,*) nstep,real((stpxx+stcxx+stsrxx+ &
+! 
+!  xx
+   stress_tensor(1)=real((stpxx+stcxx+stsrxx+ &
                  stp2xx+stpsrxx+stpqquadxx+stpdipquadxx+ &
-                 stpquadquadxx+stqsrxx)/cellvol),real(( &
+                 stpquadquadxx+stqsrxx)/cellvol)
+! xy
+   stress_tensor(2)=real((stpxy+stcxy+stsrxy+ &
+                 stp2xy+stpsrxy+stpqquadxy+stpdipquadxy+ &
+                 stpquadquadxy+stqsrxy)/cellvol)
+! yy
+   stress_tensor(3)=real(( &
                  stpyy+stcyy+stsryy+stp2yy+stpsryy+ &
                  stpqquadyy+stpdipquadyy+stpquadquadyy+ &
-                 stqsryy)/cellvol),real((stpzz+stczz+stsrzz+ &
+                 stqsryy)/cellvol)
+! xz
+   stress_tensor(4)=real((stpxz+stcxz+stsrxz+stp2xz+stpsrxz+ &
+                 stpqquadxz+stpdipquadxz+stpquadquadxz+ &
+                 stqsrxz)/cellvol)
+! zz
+   stress_tensor(5)=real((stpzz+stczz+stsrzz+ &
                  stp2zz+stpsrzz+stpqquadzz+stpdipquadzz+ &
                  stpquadquadzz+stqsrzz)/cellvol+stewzz)
+! yz
+   stress_tensor(6)=real((stpyz+stcyz+stsryz+ &
+                 stp2yz+stpsryz+stpqquadyz+stpdipquadyz+ &
+                 stpquadquadyz+stqsryz)/cellvol)
+
+#ifndef ppfit 
+   write (57,*) nstep,stress_tensor(1),stress_tensor(3),stress_tensor(5)
+                 !real((stpxx+stcxx+stsrxx+ &
+                 !stp2xx+stpsrxx+stpqquadxx+stpdipquadxx+ &
+                 !stpquadquadxx+stqsrxx)/cellvol),real(( &
+                 !stpyy+stcyy+stsryy+stp2yy+stpsryy+ &
+                 !stpqquadyy+stpdipquadyy+stpquadquadyy+ &
+                 !stqsryy)/cellvol),real((stpzz+stczz+stsrzz+ &
+                 !stp2zz+stpsrzz+stpqquadzz+stpdipquadzz+ &
+                 !stpquadquadzz+stqsrzz)/cellvol+stewzz)
 !
 ! components: (xy, xz, yz)
 !
-   write (58,*) nstep,real((stpxy+stcxy+stsrxy+ &
-                 stp2xy+stpsrxy+stpqquadxy+stpdipquadxy+ &
-                 stpquadquadxy+stqsrxy)/cellvol) &
-                ,real((stpxz+stcxz+stsrxz+stp2xz+stpsrxz+ &
-                 stpqquadxz+stpdipquadxz+stpquadquadxz+ &
-                 stqsrxz)/cellvol),real((stpyz+stcyz+stsryz+ &
-                 stp2yz+stpsryz+stpqquadyz+stpdipquadyz+ &
-                 stpquadquadyz+stqsryz)/cellvol)
+   write (58,*) nstep,stress_tensor(2),stress_tensor(4),stress_tensor(6)
+                 !real((stpxy+stcxy+stsrxy+ &
+                 !stp2xy+stpsrxy+stpqquadxy+stpdipquadxy+ &
+                 !stpquadquadxy+stqsrxy)/cellvol) &
+                 !,real((stpxz+stcxz+stsrxz+stp2xz+stpsrxz+ &
+                 !stpqquadxz+stpdipquadxz+stpquadquadxz+ &
+                 !stqsrxz)/cellvol),real((stpyz+stcyz+stsryz+ &
+                 !stp2yz+stpsryz+stpqquadyz+stpdipquadyz+ &
+                 !stpquadquadyz+stqsryz)/cellvol)
 !
 ! charge-dipole + s-r dipole + dipole-dipole term:
 !
@@ -164,7 +195,13 @@ if(pervel) then
       write(60,*) hlab3(1,1)*x(i)+hlab3(1,2)*y(i)+hlab3(1,3)*z(i), &
                   hlab3(2,1)*x(i)+hlab3(2,2)*y(i)+hlab3(2,3)*z(i), &
                   hlab3(3,1)*x(i)+hlab3(3,2)*y(i)+hlab3(3,3)*z(i)
-   enddo   
+   enddo  
+      if (dippimlog) then
+         do i=1, num
+            write(24,*) xmu(i), ymu(i), zmu(i)
+         enddo
+      endif
+
 endif
 
 if(perfric) then
@@ -334,7 +371,7 @@ if(perfric) then
                                 ,real(quaimyz(nmon(i)))
       enddo   
    endif
+#endif
 endif
-
 return
 END SUBROUTINE

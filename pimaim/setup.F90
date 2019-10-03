@@ -37,6 +37,7 @@ CHARACTER(len=30) filenamesrxx,filenamesryy,filenamesrzz        &
 double precision :: dl_tol
 indi = '123456789'
 
+#ifndef ppfit
 if((dippimlog).or.(quadpimlog)) then
 !---> Parallelization_S
    if( iam .eq. 0 ) then
@@ -117,10 +118,10 @@ endif
 
 !---> Parallelization_S
 if( iam .eq. 0 ) then
-
 open (21,file='eng1.out',status='new')
 open (22,file='velocities.out',status='new')
 open (23,file='positions.out',status='new')
+open (24,file='dipoles.out',status='new')
 open (25,file='eng2.out',status='new')
 open (30,file='kintemp.out',status='new')
 open (32,file='celleng.out',status='new')
@@ -128,7 +129,8 @@ open (33,file='engtot.out',status='new')
 open (34,file='pzeta.out',status='new')
 open (36,file='commomentum.out',status='new')
 open (44,file='bzeta.out',status='new')
-!open (41,file='disp.out',status='new')         !!MABC: this file gets too big!
+open (41,file='disp.out',status='new')         !!MABC: this file gets too big!
+open (48,file='forces.out',status='new')
 open (51,file='pres_diag.out',status='new')
 open (52,file='pressure.out',status='new')
 open (53,file='celllens.out',status='new')
@@ -143,6 +145,7 @@ open (62,file='polstress.out',status='new')
 open (63,file='coulsrstress.out',status='new')
 
 endif
+#endif
 !---> Parallelization_E
 
 call date_and_time(values=time_array)           !MABC: New seed for random number generator
@@ -150,7 +153,7 @@ call date_and_time(values=time_array)           !MABC: New seed for random numbe
     !do i = 7, 8
     ! write(*,*) iseed, time_array(i)
      iseed = time_array(7)+time_array(6)
-     write(*,*) iseed
+     write(6,*) iseed
     !end do
 
 dummy=ran1(-iseed)
@@ -302,7 +305,9 @@ do i=1,num
    enddo    
 enddo    
 
+
 if(.not.restart) then
+
    do i=1,nspec
       open (7,file=cellcoordfile(i),status='old')
       do j=1,nunitcellpos(i)
@@ -363,6 +368,7 @@ if(.not.restart) then
 ! Output cell-frame coordinates.
 !
 !---> Parallelization_S
+#ifndef ppfit
    if( iam .eq. 0 ) then
 
    open(50,file='cellframe.out',status='new')
@@ -382,6 +388,7 @@ if(.not.restart) then
    close(50)
 
    endif
+#endif
 !---> Parallelization_E
 
 endif

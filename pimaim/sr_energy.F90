@@ -222,7 +222,6 @@ if(epplog) then
             else
                expftx=0.d0
             endif
-
             sgam=expft*ftalp(ipoint,jpoint)*drrec &
                +(expft*nrpower(ipoint,jpoint)*drsqrec) &
                +expftx*2.0d0*ftalpx(ipoint,jpoint)

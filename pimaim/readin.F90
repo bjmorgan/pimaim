@@ -38,7 +38,6 @@ open(10,file='runtime.inpt',status='old')
  read(10,*)nspec
 
 !  Allocate all nspec-dimensional arrays
-
 ALLOCATE ( nsp(0:nspec),chg(nspec),spectype(nspec),amass(nspec), &  
 	   polarizablelog(nspec),deformablelog(nspec) ) 
 ALLOCATE ( ftalp(nspec,nspec),ftb(nspec,nspec),ftc(nspec,nspec), &
@@ -150,11 +149,13 @@ ALLOCATE (atmnam(num),weight(num),chge(num))
        end if
     endif
  read(10,*)istrj,jstrj,keytrj        !MABC
+#ifndef ppfit
  if(iam .eq. 0) then
  open (666,file='HISTORY',status='unknown')
  write(666,'(a150)')jobname
  write(666,'(4i10)') keytrj,2,num, (nrun/jstrj)
  endif
+#endif
  read(10,*)npereng
  read(10,*)npervel
  read(10,*)nperfri
@@ -452,6 +453,7 @@ open(10,file='cf.inpt',status='old')
    enddo
 close(10)
 
+
 if(lscalc) then
 !---> Parallelization_S
 if( iam .eq. 0 ) then
@@ -601,14 +603,15 @@ endif
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
-write (*,*)
-write (*,*) '**** Run-time parameters read in ****'
-write (*,*)
+write (6,*)
+write (6,*) '**** Run-time parameters read in ****'
+write (6,*)
 
 endif
 !---> Parallelization_E
 
 ! Write out the potential in eV/Angstrom units
+#ifndef ppfit
 open(999, file = 'ev_ang_potential', status='replace')
 if(xftlog .eqv. .true.) then
 	do i = 1, nspec
@@ -627,7 +630,7 @@ if(xftlog .eqv. .true.) then
 		enddo
 	enddo
 endif
-
+#endif
 
 
 return

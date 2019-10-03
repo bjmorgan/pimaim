@@ -38,9 +38,9 @@ quaimyz=p(9*num+1:10*num)
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
-write(*,*)
-write(*,*)'**** Anion annealing completed ****'
-write(*,*)
+write(6,*)
+write(6,*)'**** Anion annealing completed ****'
+write(6,*)
 
 endif
 !<--- Parallelization_E

@@ -31,10 +31,10 @@ fnbin=float(nbin)
 lk=1
 do ii=1,nspec
    do jj=ii,nspec
+#ifndef ppfit
       filename=skname//indi(ii:ii)//indi(jj:jj)
-
       open(65,file=filename,status='new')
-
+#endif
          do ibin=1,nbin
             rk=dsqrt(rksqmax*(float(ibin)+0.5d0)/fnbin)
             binwidth=dsqrt(float(ibin+1)*rksqmax)- &
@@ -52,18 +52,24 @@ do ii=1,nspec
                totsk(ibin)=totsk(ibin)+skk
 
 !Modified by D.Marrocchelli 07/03/2008
-               
+           
+#ifndef ppfit
                if((ii.eq.nspec).and.(jj.eq.nspec)) then  
                   write(75,*)rk, totsk(ibin)
                endif
                write(65,*)rk,skk 
+#endif
+	     
             endif
          enddo    
-
+#ifndef ppfit
       close(65)
+#endif
       lk=lk+1
    enddo   
-enddo   
+enddo 
+#ifndef ppfit  
 close(75)
+#endif
 return
 END SUBROUTINE

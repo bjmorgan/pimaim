@@ -18,13 +18,13 @@ XICOMSTRUCT=XI
 AXX=0.00D0
 XX=1.00D0 / 1
 BXX=2.00D0 / 1
- if (iam.eq.0) write (*,*) 'Entering Bracket '
+ if (iam.eq.0) write (6,*) 'Entering Bracket '
 CALL MNBRAKSTRUCT(AXX,XX,BXX,FA,FX,FB)
- if (iam.eq.0) write (*,*) 'Bracket Done', FA, FX, FB 
- if (iam.eq.0) write (*,*) 'Bracket Done', AXX,XX, BXX
+ if (iam.eq.0) write (6,*) 'Bracket Done', FA, FX, FB 
+ if (iam.eq.0) write (6,*) 'Bracket Done', AXX,XX, BXX
 FRET=DBRENT(AXX,XX,BXX,F1DIMSTRUCT,DF1DIMSTRUCT,TOLSTRUC,XMIN)
 ! FRET=BRENT(AXX,XX,BXX,F1DIMSTRUCT,TOLSTRUC,XMIN)
- if (iam.eq.0) write (*,*) 'DBRENT Done ', AXX, XX, BXX, XMIN, FRET 
+ if (iam.eq.0) write (6,*) 'DBRENT Done ', AXX, XX, BXX, XMIN, FRET 
 
 XI=XMIN*XI
 P=P+XI

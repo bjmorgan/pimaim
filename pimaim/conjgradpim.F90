@@ -260,6 +260,7 @@ if(dippimlog) call dipcg
 !---> Parallelization_S
 if( iam .eq. 0 ) then
 
+#ifndef ppfit
 if(verbose)then
    do i=1,num
       write(45,*)xmu(i),ymu(i),zmu(i)
@@ -269,6 +270,7 @@ if(verbose)then
                 ,real(Cpolar(i)),real(gammapolar(i))
    enddo   
 endif
+#endif
 
 !write(*,*)
 !write(*,*)'**** Anion annealing completed ****'
