@@ -21,7 +21,6 @@ LOGICAL :: endrun, shutdown
 
 INTEGER :: nnn,i,id_in_group,excode, comm_size, parent, rank,send_data, ppfit_step, status
 double precision :: time0, time1, time2,temp
-INTEGER,DIMENSION(5):: dummy_data
 double precision, dimension(3,108):: all_force
 !CHARACTER spawndir*255, rundir*255
 CHARACTER(len=256)::spawndir,rundir
