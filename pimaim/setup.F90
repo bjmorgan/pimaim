@@ -37,6 +37,7 @@ CHARACTER(len=30) filenamesrxx,filenamesryy,filenamesrzz        &
 double precision :: dl_tol
 indi = '123456789'
 
+#ifndef ppfit
 if((dippimlog).or.(quadpimlog)) then
 !---> Parallelization_S
    if( iam .eq. 0 ) then
@@ -117,7 +118,6 @@ endif
 
 !---> Parallelization_S
 if( iam .eq. 0 ) then
-
 open (21,file='eng1.out',status='new')
 open (22,file='velocities.out',status='new')
 open (23,file='positions.out',status='new')
@@ -145,6 +145,7 @@ open (62,file='polstress.out',status='new')
 open (63,file='coulsrstress.out',status='new')
 
 endif
+#endif
 !---> Parallelization_E
 
 call date_and_time(values=time_array)           !MABC: New seed for random number generator
@@ -304,7 +305,9 @@ do i=1,num
    enddo    
 enddo    
 
+
 if(.not.restart) then
+
    do i=1,nspec
       open (7,file=cellcoordfile(i),status='old')
       do j=1,nunitcellpos(i)
@@ -365,6 +368,7 @@ if(.not.restart) then
 ! Output cell-frame coordinates.
 !
 !---> Parallelization_S
+#ifndef ppfit
    if( iam .eq. 0 ) then
 
    open(50,file='cellframe.out',status='new')
@@ -384,6 +388,7 @@ if(.not.restart) then
    close(50)
 
    endif
+#endif
 !---> Parallelization_E
 
 endif

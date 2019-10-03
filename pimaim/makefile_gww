@@ -11,19 +11,24 @@
 #
 
 # FPP options 
- FPP_BASE_OPTIONS  =   # -Dvdw_ewald # -Ddebug -Dlight_scattering -Ddebye_scherer 
+ifeq ($(PPFIT),TRUE)
+ FPP_BASE_OPTIONS  =  -Dppfit
+else
+ FPP_BASE_OPTIONS  =  
+endif # -Dvdw_ewald # -Ddebug -Dlight_scattering -Ddebye_scherer 
 # FPP_OPTIONS  =  
 #
 
 ifeq ($(TYPE),rim)
-FPP_OPTIONS = $(FPP_BASE_OPTIONS)   
+FPP_OPTIONS = $(FPP_BASE_OPTIONS) 
 endif 
 ifeq ($(TYPE),dipole)
-FPP_OPTIONS = $(FPP_BASE_OPTIONS) -Ddipole  
+FPP_OPTIONS = $(FPP_BASE_OPTIONS) -Ddipole
 endif 
 ifeq ($(TYPE),quadrupole) 
-FPP_OPTIONS = $(FPP_BASE_OPTIONS) -Ddipole  -Dquadrupole 
+FPP_OPTIONS = $(FPP_BASE_OPTIONS) -Ddipole  -Dquadrupole
 endif 
+
 
 #####################################################################################################################
 # INTEL
@@ -36,14 +41,14 @@ endif
 
 ifeq ($(DEBUG),TRUE) 
 # Debug compile 
- FFLAGS =    -O3  -ffree-form -ffree-line-length-none
- #-g -save-temps -check all -traceback  -O0 -extend-source 132 -mcmodel=medium -shared-intel -warn all -assume noold_unit_star  -fpe3  #-openmp 
+ FFLAGS =    -O2 -g -save-temps -check all -traceback  -O0 -extend-source 132 -mcmodel=medium -shared-intel -warn all -assume noold_unit_star  -fpe3  #-openmp 
+ #FFLAGS = -O3  -ffree-form -ffree-line-length-none
+
 
 else
 # optimised compiled 
- FFLAGS =     -O3  -ffree-form -ffree-line-length-none
- #-O2 -save-temps  -extend-source 132 -mcmodel=medium -shared-intel #-align array32byte #-ipo # -openmp # -openmp-report=2 # -vec-report5
-# FFLAGS =    -O3 -save-temps  -extend-source 132 -mcmodel=medium -shared-intel -align array32byte -ipo # -openmp # -openmp-report=2 # -vec-report5
+ #FFLAGS =     -O3  -ffree-form -ffree-line-length-none
+ FFLAGS =    -O3 -save-temps  -extend-source 132 -mcmodel=medium -shared-intel -align array32byte -ipo # -openmp # -openmp-report=2 # -vec-report5
 
 endif 
 
@@ -107,7 +112,7 @@ src     = main.F90 kset.F90 dcell.F90 dump.F90 ener.F90 cgener.F90 error_functio
           FRPRMNSTRUCT.F90 conjgradpim.F90 conjgradaim.F90 conjgradpimaim.F90 \
           conjstruct.F90 dipCG.F90 dipquadCG.F90 dynmat.F90 separations.F90 \
           modules.F90 boxreset.F90 tramp.F90 pramp.F90 kmaxpara.F90 numpara.F90 \
-          random.F90 output_MABC.F90 lightcfdump.F90
+          random.F90 output_MABC.F90 lightcfdump.F90 mpi_spawn.F90 tear_down.F90
 
 # Object files
 objs =  $(src:.F90=.o) 
@@ -142,7 +147,8 @@ main.o : main.F90 modules.o readin.o setup.o \
          conjgradpim.o rescale.o dump.o conjstruct.o output.o ener.o \
          trans_chains.o rdftern.o rdfouttern.o tramp.o pramp.o \
          debye_scherer_out.o shortrange.o lightfields.o \
-         lightarraynew.o lightcfcalcnew.o lightcfdump.o kmaxpara.o numpara.o 
+         lightarraynew.o lightcfcalcnew.o lightcfdump.o kmaxpara.o numpara.o \
+         mpi_spawn.o tear_down.o
 
 kset.o : kset.F90 modules.o dcell.o
 
@@ -204,7 +210,7 @@ cgsr_energy.o : cgsr_energy.F90 modules.o
 
 rescale.o : rescale.F90 modules.o 
 
-rstrun.o : rstrun.F90 modules.o velsetvv.o dcell.o invert.o boxreset.o kset.o
+rstrun.o : rstrun.F90 modules.o velsetvv.o dcell.o invert.o boxreset.o kset.o mpi_spawn.o
 
 setup.o : setup.F90 modules.o ran1.o boxreset.o dcell.o kset.o error_function.o 
 
@@ -214,7 +220,7 @@ debye_scherer_out.o : debye_scherer_out.F90 modules.o
 
 trans_chains.o : trans_chains.F90 modules.o invert.o shake.o \
                  dcell.o boxreset.o kset.o conjgradpimaim.o conjgradpim.o \
-                 conjgradaim.o ener.o kmaxpara.o
+                 conjgradaim.o ener.o kmaxpara.o mpi_spawn.o
 
 velsetvv.o : velsetvv.F90 modules.o  gauss.o rescale.o
 
@@ -264,9 +270,9 @@ conjgradpimaim.o : conjgradpimaim.F90 modules.o  \
 
 conjstruct.o : conjstruct.F90 modules.o FRPRMNSTRUCT.o
 
-dipCG.o : dipCG.F90 modules.o cgener.o
+dipCG.o : dipCG.F90 modules.o cgener.o mpi_spawn.o
 
-dipquadCG.o : dipquadCG.F90 modules.o cgener.o cgfirst1.o cgfirst2.o
+dipquadCG.o : dipquadCG.F90 modules.o cgener.o cgfirst1.o cgfirst2.o mpi_spawn.o
 
 cgfirst1.o : cgfirst1.F90 modules.o 
 
@@ -298,3 +304,6 @@ kmaxpara.o : kmaxpara.F90 modules.o
 
 numpara.o : numpara.F90 modules.o 
 
+mpi_spawn.o : mpi_spawn.F90 modules.o
+
+tear_down.o : tear_down.F90 modules.o

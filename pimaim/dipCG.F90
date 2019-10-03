@@ -2,9 +2,11 @@ SUBROUTINE dipcg
 
 USE commondata, ONLY: xmu,ymu,zmu,num,nspec,ntype,engeff,alppolar,alppolar1, &
                       alppolardel,alppolareff,elecx,elecy,elecz,ftol,xk1,nsp, &
-                      reseng,delta,polarizablelog,verbose,elecxq,elecyq,eleczq
+                      reseng,delta,polarizablelog,verbose,elecxq,elecyq,eleczq, &
+                      exit_code
 !---> Parallelization_S
 use mpipara
+use mpi_spawn
 !---> Parallelization_E
 
 IMPLICIT NONE
@@ -26,6 +28,7 @@ resx=elecx*alppolar-xmu
 resy=elecy*alppolar-ymu
 resz=elecz*alppolar-zmu
 
+#ifndef ppfit
 if(verbose) then
   if( iam .eq. 0 ) then
     write (10,*) ' Initial residues' 
@@ -34,6 +37,7 @@ if(verbose) then
     enddo
   endif
 endif 
+#endif
 
 do j=1,itmax
    res2=SUM(resx*resx+resy*resy+resz*resz)
@@ -104,17 +108,24 @@ do j=1,itmax
 enddo
 !---> Parallelization_S
 if( iam .eq. 0 ) then
-
+#ifndef ppfit
     do i = 1,num
       write (10,'(i6,1x,3(f15.8,2x))') i, xmu(i), ymu(i), zmu(i)
     enddo
+#endif
 write(6,*)'cg failed to converge - stopping ' 
 
 endif
+
 !---> Parallelization_E
 !---> Parallelization_S
-call mpi_finalize(ierr)
-!---> Parallelization_E
+exit_code  = 1
+#ifndef ppfit
+if(iam.eq.0) write(6,*)'cg failed to converge'
+call close_down_mpi()
+!<--- Parallelization_E
 STOP
-RETURN
+#endif
+
+
 END SUBROUTINE

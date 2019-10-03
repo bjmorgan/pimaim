@@ -7,10 +7,11 @@ USE commondata, ONLY: num,xmu,ymu,zmu,quadxx,quadyy,quadzz,quadxy,quadxz, &
                       ftol,xk1,xk2,xk3,xk4,polarizablelog,nspec,nsp,reseng, &
                       dipsqeng,dipquadeng,quadeng,delta,engpetot,verbose, &
                       environmentalaimlog,elecxq,elecyq,eleczq,exxq,eyyq,ezzq, &
-                      exyq,exzq,eyzq
+                      exyq,exzq,eyzq,exit_code
 
 !---> Parallelization_S
 use mpipara
+use mpi_spawn
 !<--- Parallelization_E
 
 IMPLICIT NONE
@@ -251,10 +252,13 @@ do j=1,itmax
    endif
 enddo
 !---> Parallelization_S
+
+exit_code  = 1
+#ifndef ppfit
 if(iam.eq.0) write(6,*)'cg failed to converge'
-call mpi_finalize(ierr)
-call mpi_abort(ierr)
+call close_down_mpi()
 !<--- Parallelization_E
 STOP
+#endif
 RETURN
 END SUBROUTINE

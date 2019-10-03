@@ -97,7 +97,9 @@ do j=jst,jed
 !     erfc(i,j)=erfunc(eta*dr)
       erfc(numx)=erfunc(eta*dr)
 !*<--- Memmory Reduction_E
+#ifndef ppfit
    write(911,'(i10,4(X,F12.6))') numx,dxsav(numx),dysav(numx),dzsav(numx), dr 
+#endif
    enddo   
 enddo   
 !---> Parallelization_S
@@ -287,7 +289,7 @@ quaimyz=p(9*num+1:10*num)
 
 !---> Parallelization_S
 if( iam .eq. 0 ) then
-
+#ifndef ppfit
 if(verbose)then
    do i=1,num
       if(environmentalaimlog)write(43,*)delta(i),selfeps(i),selfquaim(i)
@@ -298,7 +300,7 @@ if(verbose)then
                 ,real(Cpolar(i)),real(gammapolar(i))
    enddo   
 endif
-
+#endif
 if((.not.relaxconfig).or.verbose) then
  write(6,*)
  write(6,*)'**** Anion annealing completed ****'

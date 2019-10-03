@@ -29,6 +29,7 @@ call ener
 FP=FUNCSTRUCT(P)
 CALL DFUNCSTRUCT(P,XI)
 !---> Parallelization_S
+#ifndef ppfit
 if( iam .eq. 0 ) then
 
    write(743,*) ' FRPRMNSTRUCT ' 
@@ -38,6 +39,7 @@ do i=1,num
 enddo
 
 endif
+#endif
 !<--- Parallelization_E
 
 G=-XI
@@ -59,11 +61,12 @@ DO ITS=1,ITMAX
    if( iam .eq. 0 ) then
 
    write(6,*) 'ITS,E,dE,tol:',ITS,real(FRET),real(FRET-FP),real(FTOLSTRUC*(ABS(FRET)+ABS(FP))/2.0d0)
-
+#ifndef ppfit
      if(relaxcell) then
        write(745,*) ITS,real(boxlenx),real(boxleny),real(boxlenz)
        write(746,*) ITS,real(gama),real(beta),real(alpha)
      end if
+#endif
    endif
 !<--- Parallelization_E
 
@@ -123,6 +126,7 @@ DO ITS=1,ITMAX
    FP=FRET
    CALL DFUNCSTRUCT(P,XI)
 !---> Parallelization_S
+#ifndef ppfit
    if( iam .eq. 0 ) then
 
    write(742,*) ITS,FP
@@ -138,6 +142,7 @@ DO ITS=1,ITMAX
  end if
 
    endif
+#endif
 !<--- Parallelization_E
    GG=SUM(G*G)
    DGG=SUM((XI+G)*XI)

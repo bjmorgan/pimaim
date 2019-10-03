@@ -84,11 +84,12 @@ enddo
 
 !---> Parallelization_S
 if( iam .eq. 0 ) then
-
+#ifndef ppfit
 do i=1,num
    write(17,*)x(i),y(i),z(i)
    write(18,*)xi(i),xi(i+num),xi(i+2*num)
 enddo   
+#endif
 
 write(6,*)
 write(6,*)'**** Ion annealing completed ****'

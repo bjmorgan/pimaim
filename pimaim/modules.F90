@@ -173,6 +173,12 @@ LOGICAL :: verbose  !to control the amount of information written to disk
 LOGICAL :: firstiter !To optimize the number of calls to cgener...
 LOGICAL :: tramplog,pramplog ! T/p ramp
 LOGICAL :: lscalc   !Do the light scattering calculation
+
+LOGICAL :: ppfit_dipoles, ppfit_forces, ppfit_stresses ! does ppfit want forces, dipoles and stresses
+INTEGER :: exit_code ! for broadcasting exit info to ppfit - lets it know if cg failed
+INTEGER :: ppfit_stop
+REAL,DIMENSION(6) :: stress_tensor
+
 END MODULE COMMONDATA
 
 !----------------------------------------!
@@ -319,7 +325,7 @@ double precision, allocatable, dimension(:)     :: sctmp,scctmp
 double precision, allocatable, dimension(:,:)   :: dimtmp
 double precision, allocatable, dimension(:)     :: rdftot_w
 double precision, allocatable, dimension(:,:,:) :: rdfpart_w
-CHARACTER(len=256)::hostname
+CHARACTER(len=256)::hostname, parentdir
 INTEGER:: hosterror, hostlength
 
 end module mpipara

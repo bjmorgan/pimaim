@@ -20,11 +20,12 @@ USE commondata, ONLY: num,forfl,frrx,frry,frrz, &
           Pcomy,Pcomz,tranke,nspec,nsp,tcell,tvol,tbzeta,tpzeta,  &
           PeeVee,pzeta,bzeta,tke,gtrankin,nstep,msdcalllog,  &
           nmsdcalltime,moveions,nab,hmass,frrx3,frry3,frrz3 ,engpetot, &
-          xdisp,ydisp,zdisp
+          xdisp,ydisp,zdisp,exit_code
 USE boxdata, ONLY: vg2,vg3,h2,h3,hi2,hi3,hlab2,hlab3 &
          ,cellvol,cellvol3rec,bee,boxlenx,boxleny,boxlenz,hi,h,fullh,fullhi 
 !---> Parallelization_S
 use mpipara
+use mpi_spawn
 !<--- Parallelization_E
 !---> Debug_S
 use recipdata, only:elcall,elsall,emcall,emsall,encall,ensall,kmaxx,kmaxy,kmaxz
@@ -651,11 +652,16 @@ if(converge.gt.(free*trantkb*1.0d-17)) then
       if( iam .eq. 0 ) then
 
       write(6,*)'Convergence not in under 50 steps. Abort.'
-
+      
       endif
-      call mpi_finalize(ierr)
+      exit_code = 1
+        
+#ifndef ppfit
+      call close_down_mpi()
 !<--- Parallelization_E
       stop
+#endif
+
    endif
    goto 380
 endif
@@ -745,11 +751,12 @@ bzeta=bzeta+trantkb*SUM(bzeta3(2:5))
 !......Pcomx, Pcomy, Pcomz are available to monitor the total momentum
 tke=tranke*gtrankin
 !Dump msd information if required
+#ifndef ppfit
 if(msdcalllog) then
    if(mod(float(nstep),float(nmsdcalltime)).eq.0) then
 !---> Parallelization_S
       if( iam .eq. 0 ) then       
-
+      
       do i=1,num
          write(41,*)xdisp(i),ydisp(i),zdisp(i)
       enddo
@@ -761,6 +768,7 @@ if(msdcalllog) then
       zdisp=0.d0
    endif
 endif
+#endif
 
 return
 END SUBROUTINE

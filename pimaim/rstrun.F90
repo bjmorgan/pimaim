@@ -7,11 +7,12 @@ USE commondata, ONLY: num,x,y,z,vx,vy,vz,rescalelog,ntotstp,nsofar,nstpbrk, &
                       epsilonx,epsilony,epsilonz, &
                       quaimxx,quaimyy,quaimzz,quaimxy,quaimxz,quaimyz, &
                       quadpimlog,cimlog,daimlog,quaimlog,rimlog, &
-                      conjgradlog,rsqmax,rcut
+                      conjgradlog,rsqmax,rcut,exit_code
 USE boxdata, ONLY: vg3,h,boxlenx,boxleny,boxlenz,h3,hlab2,hlab3,halfboxminsq, &
                    b,h3,hi3,fullh
 !---> Parallelization_S
 use mpipara
+use mpi_spawn
 !<--- Parallelization_E
 
 IMPLICIT NONE
@@ -36,7 +37,8 @@ open(35,file='restart.dat',status='old')
       write(6,*)'No coordinate information in restart file!'
 
       endif
-      call mpi_finalize(ierr)
+      exit_code = 1
+      call close_down_mpi() 
 !<--- Parallelization_E
       stop
    endif
@@ -139,7 +141,7 @@ close(35)
 
 !---> Parallelization_S
 if( iam .eq. 0 ) then
-
+#ifndef ppfit
 open(50,file='startuppos.out',status='new')
    do i=1,num
       write(50,*) h(1,1)*x(i)+h(1,2)*y(i)+h(1,3)*z(i), &
@@ -147,6 +149,7 @@ open(50,file='startuppos.out',status='new')
                   h(3,1)*x(i)+h(3,2)*y(i)+h(3,3)*z(i)
    enddo
 close(50)
+#endif
 
 write(6,*)
 write(6,*)'**** Run restarted ****'

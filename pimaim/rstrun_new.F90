@@ -12,6 +12,7 @@ SUBROUTINE rstrun
                    b,h3,hi3,fullh
 
   use mpipara
+  use mpi_spawn
 
   IMPLICIT NONE
 
@@ -90,7 +91,8 @@ SUBROUTINE rstrun
         write(6,*)'No coordinate information in restart file!'
         write(6,*)'STOPPING !'
       endif
-      call mpi_finalize(ierr)
+      exit_code = 1
+      call close_down_mpi()
       stop
     endif
 

@@ -11,25 +11,63 @@ USE recipdata, ONLY: norm_ds,sk_ds,elcall,elsall,emcall,emsall,encall,ensall, &
 USE lightdata, ONLY: lsint,ncorrtime,ncorrcall,ncorr,elecxu,elecyu,eleczu
 
 use mpipara
+use mpi_spawn
+use tear_down
 
 IMPLICIT NONE
 
 
 LOGICAL :: endrun, shutdown
 
-INTEGER :: nnn,i,id_in_group,excode, comm_size, parent, rank,send_data
-double precision :: time0, time1, time2
+INTEGER :: nnn,i,id_in_group,excode, comm_size, parent, rank,send_data, ppfit_step, status
+double precision :: time0, time1, time2,temp
+INTEGER,DIMENSION(5):: dummy_data
+double precision, dimension(3,108):: all_force
+!CHARACTER spawndir*255, rundir*255
+CHARACTER(len=256)::spawndir,rundir
+
+INTEGER::nargs
+
+rundir=''
+spawndir=''
 
 call mpi_init(ierr)
 call mpi_comm_size(mpi_comm_world,nprocs,ierr)
 call mpi_comm_rank(mpi_comm_world,iam,ierr)
 call mpi_COMM_get_parent(parent,ierr)
-
+call mpi_get_processor_name(HOSTNAME,hostlength, hosterror)
+call read_command_line_args()
+call mpi_Barrier(mpi_comm_world,ierr)
 time0 = mpi_wtime()
 
+ppfit_stop = 0
+
+#ifdef ppfit
+do !while (ppfit_stop ==0)
+
+call check_optimisation_status(parent)
+
+if (iam .eq. 0) write(6,*) "Checking PPFIT in pimaim",ppfit_stop
+if (ppfit_stop > 0) then
+    write(6,*),"gonna exit in pimaim"
+    write(6,*) 'PPFIT optimisation ended. Exiting loop in pimaim.'
+    exit
+end if
+
+call MPI_BCast(rundir, 255, MPI_CHAR, 0, parent, ierr)
+call MPI_BARRIER(parent,ierr)
+CALL chdir(TRIM(rundir))
+
+status = getcwd( spawndir )
+
+
 if((iam .eq. 0) .and. (parent .ne. mpi_comm_null)) then
-     open(unit=6, file="OUT.OUT")
+    open(unit=6, file="OUT.OUT")
 endif
+
+#endif
+
+
 
 if (iam.eq.0) then
 
@@ -71,8 +109,8 @@ if (iam.eq.0) then
   write(6,*) ' Version 2.1 - maintained by Prof G. Watson, TCD (watsong@tcd.ie)'
   write(6,*) ' '
   write(6,*) ' '
-  CALL MPI_GET_PROCESSOR_NAME(HOSTNAME,hostlength, hosterror)
   write(6,*) '                  Running on host: ',trim(hostname),'            '
+  write(6,*) '                     in rundir: ',trim(rundir),' spawn:',trim(spawndir)
 
 
 endif 
@@ -82,6 +120,7 @@ endrun=.false.
 shutdown=.false.
 nstep=0
 nrdfcall=0
+exit_code = 0
 
 vg2=0.d0
 vg3=0.d0
@@ -159,6 +198,7 @@ quaimzz=0.d0
 quaimxy=0.d0
 quaimxz=0.d0
 quaimyz=0.d0
+
 if(environmentalaimlog)then
    selfeps=0.d0
    selfquaim=0.d0
@@ -209,7 +249,7 @@ if(restart) call rstrun      !Restart from a previous run...
 ! GWW calculation of dynamical matrix and phonons 
   if(dynam) then        !Calculates the dynamical matrix in 
     call dynmat        !order to calculate the phonons...
-    call mpi_finalize(ierr)
+    call close_down_mpi() 
     stop
   endif
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -228,7 +268,6 @@ ALLOCATE ( encall(num,0:kmaxz+1), ensall(num,0:kmaxz+1) )
 
    allocate( kmaxy_s(0:kmaxx), kmaxy_e(0:kmaxx) )
    allocate( kmaxz_s(-kmaxy:kmaxy,0:kmaxx), kmaxz_e(-kmaxy:kmaxy,0:kmaxx) )
-
    call kmaxpara
 
 
@@ -249,7 +288,7 @@ endif
       if( iam .eq. 0 ) then
         write (6,*) 'Cannot rescale from zero temperature!'
       endif
-      call mpi_finalize(ierr)
+      call close_down_mpi()
       stop
     endif
     if( iam .eq. 0 ) then
@@ -281,9 +320,12 @@ forfl=.false.
     chgdumplog=.false.
     fulldumplog=.true.
     fileout='testout.rst'
-    if( iam .eq. 0 ) call dump
 
-    call mpi_finalize(ierr)
+#ifndef ppfit    
+    if( iam .eq. 0 ) call dump
+#endif
+    print*,"in relaxconfig"
+      call close_down_mpi()
     stop
   endif
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -312,8 +354,11 @@ if(nrun.eq.0) then
    fileout='testout.rst'
 !---> Parallelization_S
 !  call dump
+#ifndef ppfit
    if( iam .eq. 0 ) call dump
-   call mpi_finalize(ierr)
+#endif
+   print*,"in static"
+   call close_down_mpi()
 !<--- Parallelization_E
    stop
 endif
@@ -342,15 +387,17 @@ endif
    endif
 
 !Call routine to move the ions according to NVE,NVT or NPT ensembles...
+#ifndef ppfit
    call trans_vv
+#endif
 
-!#ifdef debug 
+#ifdef debug 
    if( iam .eq. 0 ) then
       do i=1,num
          write(48,*)frrx(i),frry(i),frrz(i)
       enddo
    endif
-!#endif 
+#endif 
 
 ! ****** Periodic parts of main loop ******
 !
@@ -442,12 +489,12 @@ endif
    if(endrun) then
       shutdown=.true.
       if( iam .eq. 0 ) call output
-
       veldumplog=.true.
       crddumplog=.true.
       chgdumplog=.true.
       fulldumplog=.true. 
       fileout='testout.rst'
+#ifndef ppfit
       if( iam .eq. 0 ) then
         call dump
         call rdfout
@@ -455,6 +502,7 @@ endif
         call debye_scherer_out
 #endif 
       endif
+#endif
 
 !  Dump the light scattering correlation functions and the store arrays 
 !required to restart the calculation.
@@ -466,6 +514,7 @@ endif
 #endif 
 
 !---> Parallelization_S
+#ifndef ppfit
       if( iam .eq. 0 ) then
 
        close(21)
@@ -485,12 +534,15 @@ endif
        enddo    
 
        endif
+#endif
      endif
 ! end of strange sectiopn in main loop which dump stuff if finishing 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! GWW - write HISTORY file 
+! GWW - write HISTORY file
+#ifndef ppfit 
     if( iam .eq. 0) call output_MABC    
+#endif
 
     nstep=nstep+1
   enddo
@@ -498,22 +550,31 @@ endif
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-! GWW - timing for run 
+! GWW - timing for run & close down mpi & stop
+
+#ifdef ppfit
+  call send_exit_code_to_parent()
+  close(6)
+  if ((iam .eq. 0) .and. (exit_code.eq.0)) then
+      call send_data_to_parent()
+      call flush()
+  end if
+  CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
+  call free_arrays()
+#endif
+
+
+#ifdef ppfit
+end do !ppfit_step
+#endif
+  print*,"exited loop in pimaim - gonna close down"
   time1 = mpi_wtime()
   time2 = time1 - time0
   if( iam .eq. 0 ) then
     write(6,'(a,F20.8,a)') ' Elapsed Time : ',time2,' (Sec.)'
   endif
-
-  call flush()
-
-if (parent .ne. MPI_COMM_NULL) then
-    call MPI_BARRIER(parent,ierr)
-    call MPI_COMM_DISCONNECT(parent,ierr)
-end if
-
-! GWW - close down MIP and stop 
-  call mpi_finalize(ierr)
+  print*,"about to call final"
+  call close_down_mpi()
   stop
 
 END PROGRAM

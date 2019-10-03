@@ -76,7 +76,7 @@ DO ITER=1,ITMAX
      FU=F(U)
      IF(FU.GT.FX) EXIT
    ENDIF
-    if (iam.eq.0)  WRITE(*,*) 'In Brent', U, FU  
+    if (iam.eq.0)  WRITE(6,*) 'In Brent', U, FU  
    DU=DF(U)
    IF(FU.LE.FX) THEN
      IF(U.GE.X) THEN
