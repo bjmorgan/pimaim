@@ -34,9 +34,10 @@ contains
     recip_del_r = 1 / del_r 
 
 ! should use eta and cutoff ( eta * rcut) - 8.0 should be sufficient 
-!    maxtable =  int (132.0 / del_r )
-!    print*,"max_table",maxtable 
+    maxtable =  int (132.0 / del_r )
+#ifdef ppfit
     maxtable =  10000000 
+#endif
     allocate (erfc_table(maxtable)) 
     do i = 1, maxtable 
       r = r + del_r
